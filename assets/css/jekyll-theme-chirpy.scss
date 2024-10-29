@@ -1,0 +1,13 @@
+---
+---
+
+@import 'main
+{%- if jekyll.environment == ' production
+  ' -%}
+  .bundle
+{%- endif -%}
+';
+
+@import 'animation.scss'; // 背景动画样式
+@import 'colorbox.scss'; // colorbox 样式
+@import 'details.scss'; // details 元素样式
