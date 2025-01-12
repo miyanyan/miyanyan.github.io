@@ -6,6 +6,7 @@ tag: [c++, std]
 ---
 
 # msvc
+源码见[https://github.com/microsoft/STL/blob/main/stl/inc/functional](https://github.com/microsoft/STL/blob/main/stl/inc/functional)
 
 ## 预备知识
 
