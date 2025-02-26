@@ -13,8 +13,8 @@ auto buffer = std::make_unique<char[]>(buffer_size);
 ```
 
 评论区jajuju提出可以使用创建buffer
-> 其实这里的情况是 make_unique 里用的 new 表达式是 new T[n]() ，对于 char 数组会进行零初始化。
-如果换用 make_unique_for_overwrite，里面的 new 表达式就是 new T[n]，此时进行默认初始化，就不会给 char 数组内容清零。
+> 其实这里的情况是 make_unique 里用的 new 表达式是 `new T[n]()` ，对于 char 数组会进行零初始化。
+如果换用 make_unique_for_overwrite，里面的 new 表达式就是 `new T[n]`，此时进行默认初始化，就不会给 char 数组内容清零。
 
 瞬间感觉学到了一个新知识，这个`make_unique_for_overwrite`真是第一次见了(没看过cppreference上的make_unique一节...)
 
