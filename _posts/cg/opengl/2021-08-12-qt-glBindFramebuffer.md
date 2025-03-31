@@ -1,6 +1,6 @@
 ---
 title:      "【Qt】glBindFramebuffer(GL_FRAMEBUFFER, 0) 导致屏幕空白的问题"
-date:       2022-09-01
+date:       2021-08-12
 categories: [computer-graphics, opengl]
 tag: [c++, opengl, qt]
 ---
