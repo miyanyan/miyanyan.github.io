@@ -1,7 +1,7 @@
 ---
 title:      "C++ std::function 实现原理"
 date:       2024-12-22
-categories: [c++]
+categories: [c++, std]
 tag: [c++, std]
 ---
 
@@ -13,7 +13,7 @@ tag: [c++, std]
 ### 参数类型，可以分为一元(unary)和二元(binary)，这个概念很重要，gcc的实现里也用到。
 可以看到msvc里定义了三个_Arg_types：无参数类型；接受一个参数，一元；接受两个参数，二元。
 并且_Arg_types没有成员变量，只是定义了对应的类型。
-```
+``` c++
 template <class... _Types>
 struct _Arg_types {}; // provide argument_type, etc. when sizeof...(_Types) is 1 or 2
 
@@ -37,7 +37,7 @@ struct _Arg_types<_Ty1, _Ty2> {
 
 我们看一下msvc实现的接口类，正好符合这四个特点。
 这里需要注意关键字```__declspec(novtable)```，它用于告诉编译器不要生成vtable，这样就可以减少额外的开销，毕竟function作为一个很基础的功能，当然是能省则省。
-```
+``` c++
 template <class _Rx, class... _Types>
 class __declspec(novtable) _Func_base { // abstract base for implementation types
 public:
@@ -68,7 +68,7 @@ private:
 ### 内存对象
 
 首先进入function class，它继承自_Get_function_impl::type，public函数里都是构造函数相关，我们着重观察这个_Get_function_impl实现。**没有成员变量**
-```
+``` c++
 template <class _Fty>
 class function : public _Get_function_impl<_Fty>::type { // wrapper for callable objects
 private:
@@ -80,7 +80,7 @@ public:
 ```
  
 可以看到_Get_function_impl的主要部分为_Get_function_impl::type，它是_Func_class<_Ret, _Types...>。**没有成员变量**
-```
+``` c++
 template <class _Tx>
 struct _Get_function_impl {
     static_assert(_Always_false<_Tx>, "std::function only accepts function types as template arguments.");
@@ -99,7 +99,7 @@ _NON_MEMBER_CALL(_GET_FUNCTION_IMPL, X1, X2, X3)
 _Func_class 模板参数为 返回值 + 可变参，继承自_Arg_types<_Types...>，根据参数个数拿到了对应的类型。
 * private里有**一个成员变量**_Storage _Mystorage，它是一个联合体，在64位平台上，```_Small_object_num_ptrs = 6 + 16 / sizeof(void*) = 8```，```_Space_size = (_Small_object_num_ptrs - 1) * sizeof(void*) = 56```，
   所以这个_Mystorage的实际大小为64个byte。
-  ```
+  ``` c++
     union _Storage { // storage for small objects (basic_string is small)
         max_align_t _Dummy1; // for maximum alignment
         char _Dummy2[_Space_size]; // to permit aliasing
@@ -110,19 +110,19 @@ _Func_class 模板参数为 返回值 + 可变参，继承自_Arg_types<_Types..
 * public里为构造函数 + 析构函数 + 重载operator()，符合我们的常规认知，function就是一个根据传参执行的函数。
   这里我们主要看三个函数，_Set、_Getimpl、_Tidy，它们都是在对_Mystorage的最后一个_Ptr进行操作
   * _Set，赋值给_Mystorage的最后一个_Ptr
-    ```
+    ``` c++
     void _Set(_Ptrt* _Ptr) noexcept { // store pointer to object
         _Mystorage._Ptrs[_Small_object_num_ptrs - 1] = _Ptr;
     }
     ```
   * _Getimpl，返回_Mystorage的最后一个_Ptr
-    ```
+    ``` c++
     _Ptrt* _Getimpl() const noexcept { // get pointer to object
         return _Mystorage._Ptrs[_Small_object_num_ptrs - 1];
     }
     ```
   * _Tidy，首先删除对应指针，然后_Mystorage的最后一个_Ptr置空。
-    ```
+    ``` c++
     void _Tidy() noexcept {
         if (!_Empty()) { // destroy callable object and maybe delete it
             _Getimpl()->_Delete_this(!_Local());
@@ -131,7 +131,7 @@ _Func_class 模板参数为 返回值 + 可变参，继承自_Arg_types<_Types..
     }
     ```
 * protected里主要为内存分配相关函数，我们重点关注内存分配函数_Reset，可以看到根据_Is_large主要分为两种分配方式，
-  ```
+  ``` c++
   // 当函数对象的大小超过56字节，或者对齐字节数大于max_align_t，或者是否可以不抛异常移动构造
   template <class _Impl> // determine whether _Impl must be dynamically allocated
   _INLINE_VAR constexpr bool _Is_large = sizeof(_Impl) > _Space_size || alignof(_Impl) > alignof(max_align_t)
@@ -139,7 +139,7 @@ _Func_class 模板参数为 返回值 + 可变参，继承自_Arg_types<_Types..
   ```
   * 小内存函数对象，调用 placement new，直接构造在_Mystorage上
   * 大内存函数对象，需要动态分配，内存分配到堆上
-  ```
+    ``` c++
     template <class _Fx>
     void _Reset(_Fx&& _Val) { // store copy of _Val
         if (!_Test_callable(_Val)) { // null member pointer/function pointer/std::function
@@ -155,8 +155,10 @@ _Func_class 模板参数为 返回值 + 可变参，继承自_Arg_types<_Types..
             _Set(::new (static_cast<void*>(&_Mystorage)) _Impl(_STD forward<_Fx>(_Val)));
         }
     }
-  ```
-```
+    ```
+
+### MSVC主要源码
+``` c++
 template <class _Ret, class... _Types>
 class _Func_class : public _Arg_types<_Types...> {
 public:
@@ -272,7 +274,7 @@ private:
 在_Func_class::_Reset中我们首先分配了对象_Func_impl_no_alloc，然后把其指针赋值给_Mystorage的最后一个_Ptr，这个_Func_impl_no_alloc就是函数调用的具体实现，
 它继承自_Func_base，主要实现了调用、移动、复制、删除接口：
 
-```
+``` c++
 template <class _Callable, class _Rx, class... _Types>
 class _Func_impl_no_alloc final : public _Func_base<_Rx, _Types...> {
     // derived class for specific implementation types that don't use allocators
@@ -322,7 +324,7 @@ private:
 ```
 
 我们主要看一下_Do_call函数，它内部调用了_Invoker_ret<_Rx>::_Call，最终调用std::invoke完成函数调用
-```
+``` c++
 // helper to give INVOKE an explicit return type; avoids undesirable Expression SFINAE
 template <class _Rx, bool = is_void_v<_Rx>>
 struct _Invoker_ret { // selected for _Rx being cv void

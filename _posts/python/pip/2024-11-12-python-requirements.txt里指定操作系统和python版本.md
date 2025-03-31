@@ -1,7 +1,7 @@
 ---
 title:      "python requirements.txt 里指定操作系统和python版本"
 date:       2024-11-12
-categories: [python]
+categories: [python, pip]
 tag: [python, pip]
 ---
 

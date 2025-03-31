@@ -1,7 +1,7 @@
 ---
 title:      "使用std::make_unique_for_overwrite创建一个char数组当缓冲区"
 date:       2025-02-24
-categories: [c++]
+categories: [c++, std]
 tag: [c++, std]
 ---
 
