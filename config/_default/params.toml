@@ -77,7 +77,7 @@ enabled = true
 ## Comments
 [comments]
 enabled = true
-provider = "disqus"
+provider = "giscus"
 
 [comments.disqusjs]
 shortname = ""
@@ -128,10 +128,10 @@ serverName = "cactus.chat"
 siteName = ""
 
 [comments.giscus]
-repo = ""
-repoID = ""
-category = ""
-categoryID = ""
+repo = "miyanyan/miyanyan.github.io"
+repoID = "R_kgDONG8yaQ"
+category = "Announcements"
+categoryID = "DIC_kwDONG8yac4CjwkT"
 mapping = ""
 lightTheme = ""
 darkTheme = ""
