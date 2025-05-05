@@ -1,0 +1,17 @@
+<div id="particles-js"></div>
+<script src="/background/particles.min.js"></script>
+<script>
+  particlesJS.load('particles-js', '{{ (resources.Get "background/particlesjs-config.json").RelPermalink }}', function () {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
