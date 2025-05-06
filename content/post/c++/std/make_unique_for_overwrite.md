@@ -10,7 +10,10 @@ tags:
 weight: 1
 ---
 
-起因：
+# 使用std::make_unique_for_overwrite创建一个char数组当缓冲区
+
+## 起因
+
 看到这个[博客](https://microcai.org/2024/11/16/do-not-new-a-buffer.html)里写道这样写进行了初始化操作
 
 ```c++
@@ -23,6 +26,8 @@ auto buffer = std::make_unique<char[]>(buffer_size);
 如果换用 make_unique_for_overwrite，里面的 new 表达式就是 `new T[n]`，此时进行默认初始化，就不会给 char 数组内容清零。
 
 瞬间感觉学到了一个新知识，这个`make_unique_for_overwrite`真是第一次见了(没看过cppreference上的make_unique一节...)
+
+## 源码分析
 
 我们以[cppreference](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique)上的实现分析下源码：
 
@@ -62,5 +67,6 @@ auto buffer = std::make_unique<char[]>(buffer_size);
 
 * 因为定长数组不能通过 new 进行动态分配，所以编译时禁止。
 
-参考:
+## 参考
+
 [MSVC STL实现](https://github.com/microsoft/STL/blob/main/stl/inc/memory#L3618)
