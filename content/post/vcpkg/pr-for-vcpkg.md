@@ -10,8 +10,6 @@ tags:
 weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
-# 如何给vcpkg提pr
-
 笔者偶尔会给vcpkg提交一些包的更新，这里记录下遇到的问题，与大家分享，如能起到一点点帮助那我就更开心了。
 
 首先是github提pr的基本流程，这里假设大家都已经知道了，此为前提。
@@ -184,11 +182,11 @@ weight: 1       # You can add weight to some posts to override the default sorti
 
 ## 常见问题
 
-### 1. 有的包生成的.pc文件里有绝对路径，导致vcpkg的ci报错
+### 有的包生成的.pc文件里有绝对路径，导致vcpkg的ci报错
 
    使用[vcpkg_fixup_pkgconfig()](https://learn.microsoft.com/zh-cn/vcpkg/maintainers/functions/vcpkg_fixup_pkgconfig)进行修复，如[更新magic-enum](https://github.com/microsoft/vcpkg/pull/42158)时我发现之前的portfile.cmake里并未对pc文件进行修复
 
-### 2. 某个包的当前版本的bug需要修复，如何添加patch
+### 某个包的当前版本的bug需要修复，如何添加patch
 
 * 这个bug已经被修复了，只是没有更新到这个版本
 
@@ -228,7 +226,7 @@ weight: 1       # You can add weight to some posts to override the default sorti
     )
     ```
 
-### 3. 如何在vcpkg的ci检查中跳过某些检查
+### 如何在vcpkg的ci检查中跳过某些检查
 
 在[更新fastdds](https://github.com/microsoft/vcpkg/pull/40984)时我遇到了fastdds在老版本的android上由于缺少依赖编译不过去的问题
 

@@ -10,7 +10,6 @@ tags:
 weight: 1
 ---
 
-# 使用std::make_unique_for_overwrite创建一个char数组当缓冲区
 
 ## 起因
 
