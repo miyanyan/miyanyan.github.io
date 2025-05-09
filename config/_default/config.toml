@@ -19,3 +19,8 @@ enableGitInfo = true
 
 [pagination]
 pagerSize = 5
+
+[sitemap]
+  changefreq = "weekly"
+  filename = "sitemap.xml"
+  priority = 0.5
