@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Python on miyan的博客</title><link>https://miyan.site/tags/python/</link><description>Recent content in Python on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 10 May 2025 18:26:21 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/python/index.xml" rel="self" type="application/rss+xml"/><item><title>cython，将py文件编译成pyd/so文件</title><link>https://miyan.site/p/cython%E5%B0%86py%E6%96%87%E4%BB%B6%E7%BC%96%E8%AF%91%E6%88%90pyd/so%E6%96%87%E4%BB%B6/</link><pubDate>Sun, 10 Nov 2024 00:00:00 +0000</pubDate><guid>https://miyan.site/p/cython%E5%B0%86py%E6%96%87%E4%BB%B6%E7%BC%96%E8%AF%91%E6%88%90pyd/so%E6%96%87%E4%BB%B6/</guid><description>&lt;p>在windows下使用cythonize可以将py文件编译成pyd，这样就完成了初步的python代码加密工作
+使用前需要先安装Cython &lt;code>pip install Cython&lt;/code>
+然后对py文件执行命令&lt;code>cythonize -i -3 --directive always_allow_keywords=true xxx.py&lt;/code>
+这里有一个要注意的点：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&amp;ndash;directive always_allow_keywords=true. 这一个参数是强制生成keyword，因为有的人在写python文件时，会写成:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">input&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">//&lt;/span> &lt;span class="n">do&lt;/span> &lt;span class="n">somthing&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">res&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">input&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">input&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># 注意这里，input=input，相当于需要一个keyword&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>但是cython默认不会为一个参数的函数生成keyword，因此当出现上面这种情况时，就会出现py可以运行pyd不可以运行的情况。见&lt;a class="link" href="https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html" target="_blank" rel="noopener"
+>always_allow_keywords&lt;/a>，文档里说关闭always_allow_keywords会slightly faster，但是都用python了这点性能总感觉大差不差的，毕竟只是针对只有一个入参的函数才有用。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>下面是一个脚本，用于把目录下的所有py文件转换为pyd&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">os&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">sys&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">subprocess&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">pathlib&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">Path&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">compile_to_pyd&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">src_path&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">auto_delete&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">bool&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">path&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">isfile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">src_path&lt;/span>&lt;span class="p">)):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;input file&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">py_files&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">src_path&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">endswith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;.py&amp;#34;&lt;/span>&lt;span class="p">)):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">py_files&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">src_path&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;input dir&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># 获取目录中的所有.py文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">py_files_Path&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">list&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Path&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">src_path&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">rglob&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;*.py&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">py_files&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">absolute&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">file&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">py_files_Path&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">py_files&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;no py files...&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;building &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">py_files&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> py files...&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># 使用Cython编译为.pyd文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">files_str&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34; &amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">py_files&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># --directive always_allow_keywords=true 是为了防止有人写 res = fun(a = a) 这种情况&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># cython默认对于单参数不生成keyword，因此要强制开启&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">compile_command&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;cythonize -i -3 --directive always_allow_keywords=true &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">files_str&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">compile_command&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">subprocess&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">compile_command&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shell&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">check&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">auto_delete&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># 删除生成的 .py 和 .c 文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">py_file&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">py_files&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">c_file&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">py_file&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s2">&amp;#34;c&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">path&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">c_file&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">c_file&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">path&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">py_file&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">py_file&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;Usage: python compile_to_pyd.py &amp;lt;directory&amp;gt;&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">dir_name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">auto_delete&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;--auto-delete&amp;#34;&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">compile_to_pyd&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dir_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">auto_delete&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>python requirements.txt 里指定操作系统和python版本</title><link>https://miyan.site/p/python-requirements.txt-%E9%87%8C%E6%8C%87%E5%AE%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%92%8Cpython%E7%89%88%E6%9C%AC/</link><pubDate>Wed, 16 Nov 2022 00:00:00 +0000</pubDate><guid>https://miyan.site/p/python-requirements.txt-%E9%87%8C%E6%8C%87%E5%AE%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%92%8Cpython%E7%89%88%E6%9C%AC/</guid><description>&lt;p>在给&lt;a class="link" href="https://github.com/TBC-TJU/MetaBCI/blob/master/requirements.txt" target="_blank" rel="noopener"
+>MetaBCI&lt;/a>编写github ci时发现在不同的平台下依赖不尽相同，版本要求不尽相同，在这里记录下&lt;/p>
+&lt;p>参考&lt;a class="link" href="https://pip.pypa.io/en/stable/reference/requirement-specifiers/" target="_blank" rel="noopener"
+>https://pip.pypa.io/en/stable/reference/requirement-specifiers/&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-txt" data-lang="txt">&lt;span class="line">&lt;span class="cl"># ---------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># System platform value
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ---------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># AIX &amp;#34;aix&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># Linux &amp;#34;linux&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># Windows &amp;#34;win32&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># Windows/Cygwin &amp;#34;cygwin&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># MacOS &amp;#34;darwin&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ---------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">atomac==1.1.0; sys_platform == &amp;#39;darwin&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">futures&amp;gt;=3.0.5; python_version &amp;lt; &amp;#39;3.0&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">futures&amp;gt;=3.0.5; python_version == &amp;#39;2.6&amp;#39; or python_version==&amp;#39;2.7&amp;#39;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>pybind11使用(2) 编写C++类并导出为pyd</title><link>https://miyan.site/p/pybind11%E4%BD%BF%E7%94%A82-%E7%BC%96%E5%86%99c-%E7%B1%BB%E5%B9%B6%E5%AF%BC%E5%87%BA%E4%B8%BApyd/</link><pubDate>Fri, 02 Sep 2022 00:00:00 +0000</pubDate><guid>https://miyan.site/p/pybind11%E4%BD%BF%E7%94%A82-%E7%BC%96%E5%86%99c-%E7%B1%BB%E5%B9%B6%E5%AF%BC%E5%87%BA%E4%B8%BApyd/</guid><description>&lt;h2 id="导出的坑">导出的坑
+&lt;/h2>&lt;h3 id="dynamic-module-does-not-define-module-export-function">dynamic module does not define module export function
+&lt;/h3>&lt;p>这是由于导出的包名不一致导致的，需要保证
+cmake的project名称&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">project&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;haha&amp;#34;&lt;/span> &lt;span class="s">LANGUAGES&lt;/span> &lt;span class="s">CXX&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c"># &amp;lt;-- haha
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">find_package&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">Python&lt;/span> &lt;span class="s">3.8&lt;/span> &lt;span class="s">EXACT&lt;/span> &lt;span class="s">COMPONENTS&lt;/span> &lt;span class="s">Interpreter&lt;/span> &lt;span class="s">Development&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">find_package&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">pybind11&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">pybind11_add_module&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_NAME&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">src/main.cpp&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>与
+main.cpp里的PYBIND11_MODULE&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">PYBIND11_MODULE&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">haha&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// &amp;lt;-- haha
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">doc&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;haha c++ wrapper&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>名称一致&lt;/p>
+&lt;h3 id="回调函数">回调函数
+&lt;/h3>&lt;p>我们可以在cpp里定义一个回调函数，然后python定义一个函数传到c++里，从而从c++取到数据&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// c++
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="n">PyCallback&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">function&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pybind11&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">bytearray&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">Haha&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">public&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="n">setCallback&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PyCallback&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">pyfn&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_pyfn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pyfn&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="nf">onDataAvaiable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">buf&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">len&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_pyfn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pybind11&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">bytearray&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">len&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">private&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PyCallback&lt;/span> &lt;span class="n">m_pyfn&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">PYBIND11_MODULE&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">haha&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pybind11&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">class_&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">Haha&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Haha&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="n">def&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;setCallback&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">Haha&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">setCallback&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// python
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">def&lt;/span> &lt;span class="n">fn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hahaInstance&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Haha&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hahaInstance&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">setCallback&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fn&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span> &lt;span class="nl">True&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 阻塞保证hahaInstance一直运行，不断调用callback
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="报错some-automatic-conversions-are-optional-and-require-extra-headers-to-be-included-when-compiling-your-pybind11-module">报错：Some automatic conversions are optional and require extra headers to be included when compiling your pybind11 module
+&lt;/h4>&lt;p>这是由于使用了c++的function但是导出的时候未&lt;code>#include &amp;lt;pybind11/functional.h&amp;gt;&lt;/code>&lt;/p>
+&lt;h4 id="报错-dll-load-failed-while-importing-xxx">报错: DLL load failed while importing xxx
+&lt;/h4>&lt;p>这是由于c++库引用了某个dll，但是没和pyd放到同一路径下，python import 的时候自然找不到对应的dll了&lt;/p>
+&lt;h4 id="执行python传入的回调函数时直接crash">执行python传入的回调函数时直接crash
+&lt;/h4>&lt;p>cpp里不能把PyCallback写成引用&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">Haha&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">private&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PyCallback&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">m_pyfn&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// &amp;lt;-- 不能写引用
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>pybind11使用(1) cmake + vcpkg 环境配置以及一些坑</title><link>https://miyan.site/p/pybind11%E4%BD%BF%E7%94%A81-cmake--vcpkg-%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E4%BB%A5%E5%8F%8A%E4%B8%80%E4%BA%9B%E5%9D%91/</link><pubDate>Thu, 01 Sep 2022 00:00:00 +0000</pubDate><guid>https://miyan.site/p/pybind11%E4%BD%BF%E7%94%A81-cmake--vcpkg-%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E4%BB%A5%E5%8F%8A%E4%B8%80%E4%BA%9B%E5%9D%91/</guid><description>&lt;h2 id="看似简单的配置流程">看似简单的配置流程
+&lt;/h2>&lt;ul>
+&lt;li>
+&lt;p>安装 : &lt;code>vcpkg install pybind11&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>编写 cmake&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">find_package&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">pybind11&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">pybind11_add_module&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_NAME&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">src/main.cpp&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;h2 id="问题随之而来">问题随之而来
+&lt;/h2>&lt;h3 id="build-link--fatal-error-lnk1104-cannot-open-file-optimizedlib">[build] LINK : fatal error LNK1104: cannot open file &amp;lsquo;optimized.lib&amp;rsquo;
+&lt;/h3>&lt;p>这个问题在老版vcpkg是存在的，在&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/26239" target="_blank" rel="noopener"
+>某一版本&lt;/a>修复
+而我的vcpkg好久没pull了，不幸的命中了这个问题，看来用vcpkg得及时更新&amp;hellip;&lt;/p>
+&lt;h3 id="无效的函数python_add_library">无效的函数python_add_library
+&lt;/h3>&lt;p>由于pybind11在python3.8导出的模块只能给对应的python3.8版本用，导致想用多个python版本跑行不通，因此得多个版本编译，cmake脚本应修改为:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">find_package&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">Python&lt;/span> &lt;span class="s">3.8&lt;/span> &lt;span class="s">EXACT&lt;/span> &lt;span class="s">COMPONENTS&lt;/span> &lt;span class="s">Interpreter&lt;/span> &lt;span class="s">Development&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">find_package&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">pybind11&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">pybind11_add_module&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_NAME&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">src/main.cpp&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>这里有个坑，如果写&lt;code>find_package (Python 3.8 EXACT REQUIRED)&lt;/code>而不是&lt;code>find_package (Python 3.8 EXACT COMPONENTS Interpreter Development REQUIRED)&lt;/code>就会提示找不到&lt;code>python_add_library&lt;/code>&lt;/strong>&lt;/p>
+&lt;h3 id="python的版本管理">python的版本管理
+&lt;/h3>&lt;p>主要有两种方法：&lt;/p>
+&lt;h4 id="手动安装python版本">手动安装python版本
+&lt;/h4>&lt;p>下载python并安装，注意要把路径添加到环境变量&lt;/p>
+&lt;h4 id="vcpkg的version特性">vcpkg的version特性
+&lt;/h4>&lt;p>使用version特性需要开启&lt;a class="link" href="https://vcpkg.io/en/docs/users/versioning.html" target="_blank" rel="noopener"
+>vcpkg的mainfest模式&lt;/a>
+在CmakeLists.txt的同级目录编写vcpkg.json文件：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;test&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;builtin-baseline&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;c0b6d35a67d2ad358a6ced92b7aad16a7bf17737&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;dependencies&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;python3&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;gt;=&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;3.8.3&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;pybind11&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;overrides&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;python3&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;3.8.3&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="终于可以愉快使用pybind11啦">终于可以愉快使用pybind11啦
+&lt;/h2></description></item></channel></rss>
