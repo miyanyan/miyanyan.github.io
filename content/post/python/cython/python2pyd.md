@@ -8,7 +8,6 @@ tags:
     - python
     - cython
     - pyd
-weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
 在windows下使用cythonize可以将py文件编译成pyd，这样就完成了初步的python代码加密工作

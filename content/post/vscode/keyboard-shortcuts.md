@@ -7,7 +7,6 @@ categories:
 tags:
     - vscode
     - visual studio
-weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
 1. 切换头文件/源文件(**F4**)

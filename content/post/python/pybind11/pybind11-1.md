@@ -11,7 +11,6 @@ tags:
     - c++
     - vcpkg
     - cmake
-weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
 ## 看似简单的配置流程

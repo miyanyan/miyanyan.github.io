@@ -8,7 +8,6 @@ tags:
     - cmake
     - c++
     - vcpkg
-weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
 1. cmake 输出相关信息

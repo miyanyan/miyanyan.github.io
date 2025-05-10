@@ -7,7 +7,6 @@ categories:
 tags:
     - c++
     - std
-weight: 1
 ---
 
 

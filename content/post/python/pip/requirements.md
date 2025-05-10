@@ -7,7 +7,6 @@ categories:
 tags:
     - python
     - pip
-weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
 在给[MetaBCI](https://github.com/TBC-TJU/MetaBCI/blob/master/requirements.txt)编写github ci时发现在不同的平台下依赖不尽相同，版本要求不尽相同，在这里记录下

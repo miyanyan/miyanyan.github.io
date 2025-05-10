@@ -7,7 +7,6 @@ categories:
 tags:
     - vcpkg
     - github
-weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
 笔者偶尔会给vcpkg提交一些包的更新，这里记录下遇到的问题，与大家分享，如能起到一点点帮助那我就更开心了。
