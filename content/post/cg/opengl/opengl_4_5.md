@@ -1,7 +1,7 @@
 ---
 title:      "OpenGL 4.5+ 的 VAO、VBO、IBO写法"
 date:       2022-08-30
-categories: [computer-graphics, opengl]
+categories: [computer-graphics]
 tag: [computer-graphics, c++, opengl, qt]
 ---
 
