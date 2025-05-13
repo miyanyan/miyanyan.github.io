@@ -135,9 +135,11 @@ tags:
 
     ``` cmake
     set(DLL_PATH ******)
+    set(OUTPUT_DIR ******)
     add_custom_command(TARGET XXX POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${DLL_PATH}
+        ${OUTPUT_DIR}
         COMMENT "Copying DLL to output directory"
     )
     ```
