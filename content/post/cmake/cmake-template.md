@@ -130,3 +130,16 @@ tags:
     include(GoogleTest)
     gtest_discover_tests(test_main WORKING_DIRECTORY ${XXX_OUTPUT_DIR})
     ```
+
+11. cmake 拷贝文件（如dll、exe等）到指定目录
+
+    ``` cmake
+    set(DLL_PATH ******)
+    set(OUTPUT_DIR ******)
+    add_custom_command(TARGET XXX POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${DLL_PATH}
+        ${OUTPUT_DIR}
+        COMMENT "Copying DLL to output directory"
+    )
+    ```
