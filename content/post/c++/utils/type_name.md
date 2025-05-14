@@ -10,8 +10,15 @@ tag: [c++, std]
 
 ## 原理
 
-* 获取到各个编译器下的原有名字，msvc下为`__FUNCSIG__`，gcc和clang下为`__PRETTY_FUNCTION__`
+* 获取到各个编译器下的原有名字
+  * 使用编译器宏获取，msvc下为`__FUNCSIG__`，gcc和clang下为`__PRETTY_FUNCTION__`
+  * 使用c++20的source_location的function_name获取，但是注意，**这个函数不是所有的版本的适用**，见[Improve std::source_location::function_name() informativeness #3063](https://github.com/microsoft/STL/issues/3063)
+
+  最终采用宏的方式获取
 * 进行拆分截断
+  * 创建一个模板函数，模板参数`typename T`，在函数内使用上述的宏得到原始的字符串
+  * 三大编译器的输出都是 **前缀 + 内容 + 后缀** 的方式，且前后缀的长度固定，因此找到前缀和后缀的位置并拆分
+  * 可以先建立一个模板，我们以`int`为模板，编译期内得到前后缀长度
 
 **【缺陷】并不能保证各个编译器下的字符串完全一致，包括但不限于多或少一个空格，逗号的位置等等（msvc还会加上class struct union关键字！）**
 
@@ -36,15 +43,6 @@ constexpr std::string_view get_raw_name() {
 #endif
 }
 
-template <auto T>
-constexpr std::string_view get_raw_name() {
-#ifdef _MSC_VER
-  return __FUNCSIG__;
-#else
-  return __PRETTY_FUNCTION__;
-#endif
-}
-
 template <typename T>
 inline constexpr std::string_view type_string() {
   constexpr std::string_view sample = get_raw_name<int>();
@@ -56,4 +54,5 @@ inline constexpr std::string_view type_string() {
 }
 ```
 
+代码确实很简洁！但是输出不能保证各个编译器的一致性，具体输出见：
 [compiler explorer 在线运行链接](https://www.godbolt.org/z/dncsebqKv)
