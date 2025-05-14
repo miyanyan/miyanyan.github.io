@@ -19,6 +19,9 @@ tag: [c++, std]
   * 创建一个模板函数，模板参数`typename T`，在函数内使用上述的宏得到原始的字符串
   * 三大编译器的输出都是 **前缀 + 内容 + 后缀** 的方式，且前后缀的长度固定，因此找到前缀和后缀的位置并拆分
   * 可以先建立一个模板，我们以`int`为模板，编译期内得到前后缀长度
+    * msvc: `class std::basic_string_view<char,struct std::char_traits<char> > __cdecl get_raw_name<int>(void)`
+    * gcc: `constexpr std::string_view get_raw_name() [with T = int; std::string_view = std::basic_string_view<char>]`
+    * clang: `std::string_view get_raw_name() [T = int]`
 
 **【缺陷】并不能保证各个编译器下的字符串完全一致，包括但不限于多或少一个空格，逗号的位置等等（msvc还会加上class struct union关键字！）**
 
@@ -28,11 +31,6 @@ msvc、gcc、clang下均可运行
 
 ``` c++
 #include <string_view>
-#include <iostream>
-#include <array>
-#include <vector>
-#include <deque>
-#include <queue>
 
 template <typename T>
 constexpr std::string_view get_raw_name() {
