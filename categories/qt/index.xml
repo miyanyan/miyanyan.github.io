@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Qt on miyan的博客</title><link>https://miyan.site/categories/qt/</link><description>Recent content in Qt on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 13 May 2025 21:52:10 +0800</lastBuildDate><atom:link href="https://miyan.site/categories/qt/index.xml" rel="self" type="application/rss+xml"/><item><title>Qt-ColorEditor，Qt颜色编辑器</title><link>https://miyan.site/p/qt-coloreditorqt%E9%A2%9C%E8%89%B2%E7%BC%96%E8%BE%91%E5%99%A8/</link><pubDate>Tue, 30 Jan 2024 00:00:00 +0000</pubDate><guid>https://miyan.site/p/qt-coloreditorqt%E9%A2%9C%E8%89%B2%E7%BC%96%E8%BE%91%E5%99%A8/</guid><description>&lt;h2 id="外观">外观
+&lt;/h2>&lt;p>分享一下我实现的颜色编辑器，主要原因是Qt的QColorDialog功能较少没法满足需求，目前已经在&lt;a class="link" href="https://github.com/zenustech/zeno" target="_blank" rel="noopener"
+>zeno&lt;/a>中使用了，由于zeno有自己的样式表，所以在zeno里长这样：&lt;/p>
+&lt;p>&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/zeno-style.png"
+loading="lazy"
+alt="zeno中的样式"
+>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>类名&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>ColorWheel&lt;/td>
+&lt;td>颜色选择器，用于选择颜色&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>GradientSlider&lt;/td>
+&lt;td>渐变滑块，带有渐变颜色&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ColorSpinHSlider&lt;/td>
+&lt;td>带标签和旋钮的水平颜色滑块&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ColorButton&lt;/td>
+&lt;td>颜色按钮，显示颜色并支持拖拽和释放颜色&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ColorPalette&lt;/td>
+&lt;td>颜色调板，显示颜色列表并支持拖拽和释放&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ColorPreview&lt;/td>
+&lt;td>颜色预览，显示当前和之前选择的颜色&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ColorComboWidget&lt;/td>
+&lt;td>颜色组合切换器，用于切换颜色组合&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ColorLineEdit&lt;/td>
+&lt;td>颜色名称文本框，显示颜色名称&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ColorPicker&lt;/td>
+&lt;td>颜色拾取器，用于抓取屏幕颜色&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="功能预览未配置样式表">功能预览（未配置样式表）
+&lt;/h2>&lt;ul>
+&lt;li>
+&lt;p>srgb切换
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/srgb.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>颜色轮选色
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/colorwheel.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>颜色文字选色
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/colortext.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>屏幕取色，主要实现是截取当前的屏幕然后根据鼠标的位置设置颜色，支持多个屏幕（我自己只测试了2个屏幕）
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/colorpicker.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>颜色滑动条选色，RGB和HSV
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/colorslider.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>颜色面板取色
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/colorpalette-select.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>颜色面板，可以把想要的颜色记录在这，持久化存储，即便关闭下一次打开也会自动加载
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/colorpalette-saveremove.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>上一个/当前颜色切换，这个主要是类似于PS之类的软件，可以缓存一个颜色用来备选或者撤销
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/color-precur.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>互补色取色，主要参考&lt;a class="link" href="https://www.canva.com/colors/color-wheel/" target="_blank" rel="noopener"
+>color-wheel&lt;/a>
+&lt;img src="https://cdn.jsdelivr.net/gh/miyanyan/miyan-image@main/img/colorcombination.gif"
+loading="lazy"
+>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="如何使用">如何使用
+&lt;/h2>&lt;p>github地址&lt;a class="link" href="https://github.com/miyanyan/Qt-ColorEditor" target="_blank" rel="noopener"
+>Qt-ColorEditor&lt;/a>&lt;/p>
+&lt;p>复制 &lt;code>ColorWidgets&lt;/code> 文件夹(只包含两个文件: &lt;code>ColorEditor.h&lt;/code> 和 &lt;code>ColorEditor.cpp&lt;/code>) 到你的项目，记得添加到构建系统如cmake中.&lt;/p>
+&lt;p>接口参照QColorDialog的方式：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;ColorWidgets/ColorEditor.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// call here, you can find this in MainWindow.cpp
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">auto&lt;/span> &lt;span class="n">btn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">ColorButton&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">btn&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">setColor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Qt&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">blue&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">setCentralWidget&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">btn&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">connect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">btn&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ColorButton&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">clicked&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">btn&lt;/span>&lt;span class="p">](){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">auto&lt;/span> &lt;span class="n">color&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">ColorEditor&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">getColor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">btn&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">color&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">btn&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">setColor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">color&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>最后还得说一句，QColorDialog的功能确实有点少了，我在实现的时候参考了很多3D软件，如Houdini、Blender、Unity等，其中Houdini的功能最多，因此最终的形态也和Houdini类似了。&lt;/p></description></item></channel></rss>
