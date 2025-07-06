@@ -240,3 +240,20 @@ fastdds:arm-neon-android=fail
 fastdds:arm64-android=fail
 fastdds:x64-android=fail
 ```
+
+在[更新highifive](https://github.com/microsoft/vcpkg/pull/46268)时我遇到了highfive的feature在ci上通过了确被忽略的报错，报错信息为：
+
+``` plain text
+D:\a\_work\1\s\scripts\azure-pipelines/../ci.feature.baseline.txt:954:1: error: highfive[core]:arm64-windows passed but was marked expected to be a cascaded failure
+D:\a\_work\1\s\scripts\azure-pipelines/../ci.feature.baseline.txt:954:1: error: highfive[core,eigen3]:arm64-windows passed but was marked expected to be a cascaded failure
+D:\a\_work\1\s\scripts\azure-pipelines/../ci.feature.baseline.txt:954:1: error: highfive[core,xtensor]:arm64-windows passed but was marked expected to be a cascaded failure
+D:\a\_work\1\s\scripts\azure-pipelines/../ci.feature.baseline.txt:954:1: error: highfive[core,boost]:arm64-windows passed but was marked expected to be a cascaded failure
+```
+
+这里的意思就是feature通过了但是被标记为了理应失败，对应修改的地方为文件`scripts/ci.feature.baseline.txt`:
+
+```plain text
+highfive:arm64-uwp = cascade
+highfive:x64-uwp = cascade
+highfive[opencv]:arm64-windows = cascade
+```
