@@ -143,3 +143,58 @@ tags:
         COMMENT "Copying DLL to output directory"
     )
     ```
+12. cmake 拷贝vcpkg安装库的license到指定目录
+
+    使用方法: `copy_licenses_from_vcpkg(TARGET_NAME your_target OUTPUT_DIR license)`
+
+    ``` cmake
+    function(copy_licenses_from_vcpkg)
+        set(options)
+        set(oneValueArgs OUTPUT_DIR TARGET_NAME)
+        set(multiValueArgs)
+        cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+        # 参数校验
+        if(NOT ARG_TARGET_NAME)
+            message(FATAL_ERROR "No TARGET_NAME specified")
+        endif()
+
+        if(NOT TARGET ${ARG_TARGET_NAME})
+            message(FATAL_ERROR "No ${ARG_TARGET_NAME} target found")
+        endif()
+
+        # 设置默认输出目录
+        if(NOT ARG_OUTPUT_DIR)
+            set(ARG_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/vcpkg_licenses")
+        endif()
+
+        # 创建许可证复制目标
+        add_custom_target(_vcpkg_license_copy ALL
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${ARG_OUTPUT_DIR}"
+            COMMENT "[vcpkg] Preparing license directory: ${ARG_OUTPUT_DIR}"
+        )
+
+        # 遍历所有许可证文件
+        file(GLOB license_dirs "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/*")
+
+        foreach(license_dir IN LISTS license_dirs)
+            if(EXISTS "${license_dir}/copyright")
+                get_filename_component(lib_name "${license_dir}" NAME)
+                
+                # 排除隐藏目录
+                if(NOT lib_name MATCHES "^\\.")
+                    add_custom_command(TARGET _vcpkg_license_copy
+                        COMMAND ${CMAKE_COMMAND} -E copy
+                            "${license_dir}/copyright"
+                            "${ARG_OUTPUT_DIR}/${lib_name}.LICENSE"
+                        COMMENT "Copying ${lib_name} license"
+                        VERBATIM
+                    )
+                endif()
+            endif()
+        endforeach()
+
+        # 自动绑定依赖关系
+        add_dependencies(${ARG_TARGET_NAME} _vcpkg_license_copy)
+    endfunction()
+    ```
