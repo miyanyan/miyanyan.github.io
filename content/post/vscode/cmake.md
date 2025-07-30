@@ -20,3 +20,5 @@ tags:
         },
     }
     ```
+2. 配置generator为Ninja
+   打开vscode的设置界面，搜索`cmake.generator`，填入`Ninja`即可。
