@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cmake on miyan的博客</title><link>https://miyan.site/tags/cmake/</link><description>Recent content in Cmake on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 30 Jul 2025 11:12:05 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/cmake/index.xml" rel="self" type="application/rss+xml"/><item><title>vscode cmake 设置</title><link>https://miyan.site/p/vscode-cmake-%E8%AE%BE%E7%BD%AE/</link><pubDate>Fri, 11 Jul 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/vscode-cmake-%E8%AE%BE%E7%BD%AE/</guid><description>&lt;ol>
+&lt;li>
+&lt;p>配置CMAKE_TOOLCHAIN_FILE为vcpkg&lt;/p>
+&lt;p>打开vscode的设置界面，搜索&lt;code>cmake.configureSettings&lt;/code>，点击&lt;code>Edit in settings.json&lt;/code>并添加：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;cmake.configureSettings&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;CMAKE_TOOLCHAIN_FILE&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>配置generator为Ninja
+打开vscode的设置界面，搜索&lt;code>cmake.generator&lt;/code>，填入&lt;code>Ninja&lt;/code>即可。&lt;/p>
+&lt;/li>
+&lt;/ol></description></item><item><title>cmake编写模板</title><link>https://miyan.site/p/cmake%E7%BC%96%E5%86%99%E6%A8%A1%E6%9D%BF/</link><pubDate>Tue, 04 Mar 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/cmake%E7%BC%96%E5%86%99%E6%A8%A1%E6%9D%BF/</guid><description>&lt;ol>
+&lt;li>
+&lt;p>cmake 输出相关信息&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">STATUS&lt;/span> &lt;span class="s2">&amp;#34;CMake version: ${CMAKE_VERSION}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">STATUS&lt;/span> &lt;span class="s2">&amp;#34;CMake C compiler: ${CMAKE_C_COMPILER}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">STATUS&lt;/span> &lt;span class="s2">&amp;#34;CMake CXX compiler: ${CMAKE_CXX_COMPILER}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">STATUS&lt;/span> &lt;span class="s2">&amp;#34;Build directory: ${PROJECT_BINARY_DIR}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">STATUS&lt;/span> &lt;span class="s2">&amp;#34;Build type: ${CMAKE_BUILD_TYPE}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>判断是否被当作subproject&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Determine if is built as a subproject (using add_subdirectory)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># or if it is the master project.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span>&lt;span class="nb">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">NOT&lt;/span> &lt;span class="s">DEFINED&lt;/span> &lt;span class="s">XXX_MASTER_PROJECT&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">XXX_MASTER_PROJECT&lt;/span> &lt;span class="s">OFF&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_CURRENT_SOURCE_DIR&lt;/span> &lt;span class="s">STREQUAL&lt;/span> &lt;span class="s">CMAKE_SOURCE_DIR&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">XXX_MASTER_PROJECT&lt;/span> &lt;span class="s">ON&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">endif&lt;/span> &lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">STATUS&lt;/span> &lt;span class="s2">&amp;#34;Is build as a master project: ${XXX_MASTER_PROJECT}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endif&lt;/span> &lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>生成compile_commands.json以供clangd使用&lt;/p>
+&lt;p>windows下需要使用Ninja，如果使用vscode则在设置里把&lt;code>cmake.generator&lt;/code>设置为&lt;code>Ninja&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># generate compile_commands.json
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_EXPORT_COMPILE_COMMANDS&lt;/span> &lt;span class="s">ON&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>cmake设置rpath，unix下搜索同目录下的so文件&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_SKIP_BUILD_RPATH&lt;/span> &lt;span class="s">FALSE&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c"># 加入rpath
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_BUILD_WITH_INSTALL_RPATH&lt;/span> &lt;span class="s">TRUE&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c"># 表示编译的时候是否使用CMAKE_INSTALL_RPATH作为rpath路径
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_INSTALL_RPATH&lt;/span> &lt;span class="s2">&amp;#34;\${ORIGIN}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c"># 设置rpath安装时的路径，${ORIGIN}代表运行时当前目录
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>参考&lt;a class="link" href="https://stackoverflow.com/questions/58360502/how-to-set-rpath-origin-in-cmake" target="_blank" rel="noopener"
+>How to set rpath origin in cmake?&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>cmake设置输出目录，解决windows下命令行生成目录不正确但是IDE生成目录正确的问题
+&lt;strong>一定要放在project命令后面&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">XXX_OUTPUT_DIR&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_BINARY_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="s">/bin&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">XXX_OUTPUT_LIB_DIR&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_BINARY_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="s">/lib&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">XXX_OUTPUT_PDB_DIR&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_BINARY_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="s">/pdb&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">XXX_PLUGINS_OUTPUT_DIR&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">XXX_OUTPUT_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="s">/plugins&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># do not set cmake internal variables in functions(not work...)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># difference between windows and linux, see https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#runtime-output-artifacts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_RUNTIME_OUTPUT_DIRECTORY&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">XXX_OUTPUT_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_LIBRARY_OUTPUT_DIRECTORY&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">XXX_OUTPUT_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_ARCHIVE_OUTPUT_DIRECTORY&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">XXX_OUTPUT_LIB_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_PDB_OUTPUT_DIRECTORY&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">XXX_OUTPUT_PDB_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">foreach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">config&lt;/span> &lt;span class="s">IN&lt;/span> &lt;span class="s">ITEMS&lt;/span> &lt;span class="s">Debug&lt;/span> &lt;span class="s">Release&lt;/span> &lt;span class="s">RelWithDebInfo&lt;/span> &lt;span class="s">MinSizeRel&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">string&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">TOUPPER&lt;/span> &lt;span class="s2">&amp;#34;${config}&amp;#34;&lt;/span> &lt;span class="s">CONFIG_UPPER&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_RUNTIME_OUTPUT_DIRECTORY_&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">CONFIG_UPPER&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s2">&amp;#34;${XXX_OUTPUT_DIR}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_LIBRARY_OUTPUT_DIRECTORY_&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">CONFIG_UPPER&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s2">&amp;#34;${XXX_OUTPUT_DIR}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_ARCHIVE_OUTPUT_DIRECTORY_&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">CONFIG_UPPER&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s2">&amp;#34;${XXX_OUTPUT_LIB_DIR}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_PDB_OUTPUT_DIRECTORY_&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">CONFIG_UPPER&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s2">&amp;#34;${XXX_OUTPUT_PDB_DIR}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endforeach&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>cmake开启fPIC&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">NOT&lt;/span> &lt;span class="s">DEFINED&lt;/span> &lt;span class="s">CMAKE_POSITION_INDEPENDENT_CODE&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c"># Otherwise we can&amp;#39;t link .so libs with .a libs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_POSITION_INDEPENDENT_CODE&lt;/span> &lt;span class="s">ON&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>cmake统一符号可见性，默认隐藏&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">XXX_MASTER_PROJECT&lt;/span> &lt;span class="s">AND&lt;/span> &lt;span class="s">NOT&lt;/span> &lt;span class="s">DEFINED&lt;/span> &lt;span class="s">CMAKE_CXX_VISIBILITY_PRESET&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_CXX_VISIBILITY_PRESET&lt;/span> &lt;span class="s">hidden&lt;/span> &lt;span class="s">CACHE&lt;/span> &lt;span class="s">STRING&lt;/span> &lt;span class="s2">&amp;#34;Preset for the export of private symbols&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set_property&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CACHE&lt;/span> &lt;span class="s">CMAKE_CXX_VISIBILITY_PRESET&lt;/span> &lt;span class="s">PROPERTY&lt;/span> &lt;span class="s">STRINGS&lt;/span> &lt;span class="s">hidden&lt;/span> &lt;span class="s">default&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endif&lt;/span> &lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">XXX_MASTER_PROJECT&lt;/span> &lt;span class="s">AND&lt;/span> &lt;span class="s">NOT&lt;/span> &lt;span class="s">DEFINED&lt;/span> &lt;span class="s">CMAKE_VISIBILITY_INLINES_HIDDEN&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_VISIBILITY_INLINES_HIDDEN&lt;/span> &lt;span class="s">ON&lt;/span> &lt;span class="s">CACHE&lt;/span> &lt;span class="s">BOOL&lt;/span> &lt;span class="s2">&amp;#34;Whether to add a compile flag to hide symbols of inline functions&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endif&lt;/span> &lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>集成vcpkg toolchain&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">DEFINED&lt;/span> &lt;span class="s">ENV{VCPKG_ROOT}&lt;/span> &lt;span class="s">AND&lt;/span> &lt;span class="s">NOT&lt;/span> &lt;span class="s">DEFINED&lt;/span> &lt;span class="s">CMAKE_TOOLCHAIN_FILE&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">STATUS&lt;/span> &lt;span class="s2">&amp;#34;VCPKG_ROOT: $ENV{VCPKG_ROOT}&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">CMAKE_TOOLCHAIN_FILE&lt;/span> &lt;span class="s2">&amp;#34;$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake&amp;#34;&lt;/span> &lt;span class="s">CACHE&lt;/span> &lt;span class="s">STRING&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>集成vcpkg manifest
+&lt;strong>一定要放在project命令之前&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">XXX_RUN_TEST&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">list&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">APPEND&lt;/span> &lt;span class="s">VCPKG_MANIFEST_FEATURES&lt;/span> &lt;span class="s2">&amp;#34;tests&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">XXX_BUILD_EXAMPLES&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">list&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">APPEND&lt;/span> &lt;span class="s">VCPKG_MANIFEST_FEATURES&lt;/span> &lt;span class="s2">&amp;#34;examples&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">XXX_BUILD_BENCHMARKS&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">list&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">APPEND&lt;/span> &lt;span class="s">VCPKG_MANIFEST_FEATURES&lt;/span> &lt;span class="s2">&amp;#34;benchmarks&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>ctest集成gtest&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">enable_testing&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">GLOB_RECURSE&lt;/span> &lt;span class="s">source&lt;/span> &lt;span class="s">CONFIGURE_DEPENDS&lt;/span> &lt;span class="s">*.h&lt;/span> &lt;span class="s">*.cpp&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">find_package&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">GTest&lt;/span> &lt;span class="s">CONFIG&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">add_executable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">test_main&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">source&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">target_link_libraries&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">test_main&lt;/span> &lt;span class="s">PRIVATE&lt;/span> &lt;span class="s">GTest::gtest&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">include&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">GoogleTest&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">gtest_discover_tests&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">test_main&lt;/span> &lt;span class="s">WORKING_DIRECTORY&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">XXX_OUTPUT_DIR&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>cmake 拷贝文件（如dll、exe等）到指定目录&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">DLL_PATH&lt;/span> &lt;span class="s">******&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">OUTPUT_DIR&lt;/span> &lt;span class="s">******&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">add_custom_command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">TARGET&lt;/span> &lt;span class="s">XXX&lt;/span> &lt;span class="s">POST_BUILD&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">COMMAND&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">CMAKE_COMMAND&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">-E&lt;/span> &lt;span class="s">copy_if_different&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">${&lt;/span>&lt;span class="nv">DLL_PATH&lt;/span>&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">${&lt;/span>&lt;span class="nv">OUTPUT_DIR&lt;/span>&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">COMMENT&lt;/span> &lt;span class="s2">&amp;#34;Copying DLL to output directory&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>cmake 拷贝vcpkg安装库的license到指定目录&lt;/p>
+&lt;p>使用方法: &lt;code>copy_licenses_from_vcpkg(TARGET_NAME your_target OUTPUT_DIR license)&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">copy_licenses_from_vcpkg&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">options&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">oneValueArgs&lt;/span> &lt;span class="s">OUTPUT_DIR&lt;/span> &lt;span class="s">TARGET_NAME&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">multiValueArgs&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">cmake_parse_arguments&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">ARG&lt;/span> &lt;span class="s2">&amp;#34;${options}&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;${oneValueArgs}&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;${multiValueArgs}&amp;#34;&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">ARGN&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c"># 参数校验
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span> &lt;span class="nb">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">NOT&lt;/span> &lt;span class="s">ARG_TARGET_NAME&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">FATAL_ERROR&lt;/span> &lt;span class="s2">&amp;#34;No TARGET_NAME specified&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">NOT&lt;/span> &lt;span class="s">TARGET&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">ARG_TARGET_NAME&lt;/span>&lt;span class="o">}&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">FATAL_ERROR&lt;/span> &lt;span class="s2">&amp;#34;No ${ARG_TARGET_NAME} target found&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c"># 设置默认输出目录
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span> &lt;span class="nb">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">NOT&lt;/span> &lt;span class="s">ARG_OUTPUT_DIR&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">ARG_OUTPUT_DIR&lt;/span> &lt;span class="s2">&amp;#34;${CMAKE_CURRENT_BINARY_DIR}/vcpkg_licenses&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c"># 创建许可证复制目标
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span> &lt;span class="nb">add_custom_target&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">_vcpkg_license_copy&lt;/span> &lt;span class="s">ALL&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">COMMAND&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">CMAKE_COMMAND&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">-E&lt;/span> &lt;span class="s">make_directory&lt;/span> &lt;span class="s2">&amp;#34;${ARG_OUTPUT_DIR}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">COMMENT&lt;/span> &lt;span class="s2">&amp;#34;[vcpkg] Preparing license directory: ${ARG_OUTPUT_DIR}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c"># 遍历所有许可证文件
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span> &lt;span class="nb">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">GLOB&lt;/span> &lt;span class="s">license_dirs&lt;/span> &lt;span class="s2">&amp;#34;${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/*&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">foreach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">license_dir&lt;/span> &lt;span class="s">IN&lt;/span> &lt;span class="s">LISTS&lt;/span> &lt;span class="s">license_dirs&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">EXISTS&lt;/span> &lt;span class="s2">&amp;#34;${license_dir}/copyright&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">get_filename_component&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">lib_name&lt;/span> &lt;span class="s2">&amp;#34;${license_dir}&amp;#34;&lt;/span> &lt;span class="s">NAME&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c"># 排除隐藏目录
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span> &lt;span class="nb">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">NOT&lt;/span> &lt;span class="s">lib_name&lt;/span> &lt;span class="s">MATCHES&lt;/span> &lt;span class="s2">&amp;#34;^\\.&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">add_custom_command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">TARGET&lt;/span> &lt;span class="s">_vcpkg_license_copy&lt;/span> &lt;span class="s">POST_BUILD&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">COMMAND&lt;/span> &lt;span class="o">${&lt;/span>&lt;span class="nv">CMAKE_COMMAND&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">-E&lt;/span> &lt;span class="s">copy_if_different&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;${license_dir}/copyright&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;${ARG_OUTPUT_DIR}/${lib_name}.LICENSE&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">COMMENT&lt;/span> &lt;span class="s2">&amp;#34;Copying ${lib_name} license&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">VERBATIM&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">endif&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">endforeach&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c"># 自动绑定依赖关系
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span> &lt;span class="nb">add_dependencies&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">ARG_TARGET_NAME&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">_vcpkg_license_copy&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">endfunction&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol></description></item><item><title>pybind11使用(2) 编写C++类并导出为pyd</title><link>https://miyan.site/p/pybind11%E4%BD%BF%E7%94%A82-%E7%BC%96%E5%86%99c-%E7%B1%BB%E5%B9%B6%E5%AF%BC%E5%87%BA%E4%B8%BApyd/</link><pubDate>Fri, 02 Sep 2022 00:00:00 +0000</pubDate><guid>https://miyan.site/p/pybind11%E4%BD%BF%E7%94%A82-%E7%BC%96%E5%86%99c-%E7%B1%BB%E5%B9%B6%E5%AF%BC%E5%87%BA%E4%B8%BApyd/</guid><description>&lt;h2 id="导出的坑">导出的坑
+&lt;/h2>&lt;h3 id="dynamic-module-does-not-define-module-export-function">dynamic module does not define module export function
+&lt;/h3>&lt;p>这是由于导出的包名不一致导致的，需要保证
+cmake的project名称&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">project&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;haha&amp;#34;&lt;/span> &lt;span class="s">LANGUAGES&lt;/span> &lt;span class="s">CXX&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c"># &amp;lt;-- haha
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">find_package&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">Python&lt;/span> &lt;span class="s">3.8&lt;/span> &lt;span class="s">EXACT&lt;/span> &lt;span class="s">COMPONENTS&lt;/span> &lt;span class="s">Interpreter&lt;/span> &lt;span class="s">Development&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">find_package&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">pybind11&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">pybind11_add_module&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_NAME&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">src/main.cpp&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>与
+main.cpp里的PYBIND11_MODULE&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">PYBIND11_MODULE&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">haha&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// &amp;lt;-- haha
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">doc&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;haha c++ wrapper&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>名称一致&lt;/p>
+&lt;h3 id="回调函数">回调函数
+&lt;/h3>&lt;p>我们可以在cpp里定义一个回调函数，然后python定义一个函数传到c++里，从而从c++取到数据&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// c++
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="n">PyCallback&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">function&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pybind11&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">bytearray&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">Haha&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">public&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="n">setCallback&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PyCallback&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">pyfn&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_pyfn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pyfn&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="nf">onDataAvaiable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">buf&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">len&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_pyfn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pybind11&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">bytearray&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">len&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">private&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PyCallback&lt;/span> &lt;span class="n">m_pyfn&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">PYBIND11_MODULE&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">haha&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pybind11&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">class_&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">Haha&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Haha&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="n">def&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;setCallback&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">Haha&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">setCallback&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// python
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">def&lt;/span> &lt;span class="n">fn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hahaInstance&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Haha&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hahaInstance&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">setCallback&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fn&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span> &lt;span class="nl">True&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 阻塞保证hahaInstance一直运行，不断调用callback
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="报错some-automatic-conversions-are-optional-and-require-extra-headers-to-be-included-when-compiling-your-pybind11-module">报错：Some automatic conversions are optional and require extra headers to be included when compiling your pybind11 module
+&lt;/h4>&lt;p>这是由于使用了c++的function但是导出的时候未&lt;code>#include &amp;lt;pybind11/functional.h&amp;gt;&lt;/code>&lt;/p>
+&lt;h4 id="报错-dll-load-failed-while-importing-xxx">报错: DLL load failed while importing xxx
+&lt;/h4>&lt;p>这是由于c++库引用了某个dll，但是没和pyd放到同一路径下，python import 的时候自然找不到对应的dll了&lt;/p>
+&lt;h4 id="执行python传入的回调函数时直接crash">执行python传入的回调函数时直接crash
+&lt;/h4>&lt;p>cpp里不能把PyCallback写成引用&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">Haha&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">private&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PyCallback&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">m_pyfn&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// &amp;lt;-- 不能写引用
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>pybind11使用(1) cmake + vcpkg 环境配置以及一些坑</title><link>https://miyan.site/p/pybind11%E4%BD%BF%E7%94%A81-cmake--vcpkg-%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E4%BB%A5%E5%8F%8A%E4%B8%80%E4%BA%9B%E5%9D%91/</link><pubDate>Thu, 01 Sep 2022 00:00:00 +0000</pubDate><guid>https://miyan.site/p/pybind11%E4%BD%BF%E7%94%A81-cmake--vcpkg-%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E4%BB%A5%E5%8F%8A%E4%B8%80%E4%BA%9B%E5%9D%91/</guid><description>&lt;h2 id="看似简单的配置流程">看似简单的配置流程
+&lt;/h2>&lt;ul>
+&lt;li>
+&lt;p>安装 : &lt;code>vcpkg install pybind11&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>编写 cmake&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">find_package&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">pybind11&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">pybind11_add_module&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_NAME&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">src/main.cpp&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;h2 id="问题随之而来">问题随之而来
+&lt;/h2>&lt;h3 id="build-link--fatal-error-lnk1104-cannot-open-file-optimizedlib">[build] LINK : fatal error LNK1104: cannot open file &amp;lsquo;optimized.lib&amp;rsquo;
+&lt;/h3>&lt;p>这个问题在老版vcpkg是存在的，在&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/26239" target="_blank" rel="noopener"
+>某一版本&lt;/a>修复
+而我的vcpkg好久没pull了，不幸的命中了这个问题，看来用vcpkg得及时更新&amp;hellip;&lt;/p>
+&lt;h3 id="无效的函数python_add_library">无效的函数python_add_library
+&lt;/h3>&lt;p>由于pybind11在python3.8导出的模块只能给对应的python3.8版本用，导致想用多个python版本跑行不通，因此得多个版本编译，cmake脚本应修改为:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cmake" data-lang="cmake">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">find_package&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s">Python&lt;/span> &lt;span class="s">3.8&lt;/span> &lt;span class="s">EXACT&lt;/span> &lt;span class="s">COMPONENTS&lt;/span> &lt;span class="s">Interpreter&lt;/span> &lt;span class="s">Development&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">find_package&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">pybind11&lt;/span> &lt;span class="s">REQUIRED&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">pybind11_add_module&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">${&lt;/span>&lt;span class="nv">PROJECT_NAME&lt;/span>&lt;span class="o">}&lt;/span> &lt;span class="s">src/main.cpp&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>这里有个坑，如果写&lt;code>find_package (Python 3.8 EXACT REQUIRED)&lt;/code>而不是&lt;code>find_package (Python 3.8 EXACT COMPONENTS Interpreter Development REQUIRED)&lt;/code>就会提示找不到&lt;code>python_add_library&lt;/code>&lt;/strong>&lt;/p>
+&lt;h3 id="python的版本管理">python的版本管理
+&lt;/h3>&lt;p>主要有两种方法：&lt;/p>
+&lt;h4 id="手动安装python版本">手动安装python版本
+&lt;/h4>&lt;p>下载python并安装，注意要把路径添加到环境变量&lt;/p>
+&lt;h4 id="vcpkg的version特性">vcpkg的version特性
+&lt;/h4>&lt;p>使用version特性需要开启&lt;a class="link" href="https://vcpkg.io/en/docs/users/versioning.html" target="_blank" rel="noopener"
+>vcpkg的mainfest模式&lt;/a>
+在CmakeLists.txt的同级目录编写vcpkg.json文件：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;test&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;builtin-baseline&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;c0b6d35a67d2ad358a6ced92b7aad16a7bf17737&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;dependencies&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;python3&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;gt;=&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;3.8.3&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;pybind11&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;overrides&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;python3&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;3.8.3&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="终于可以愉快使用pybind11啦">终于可以愉快使用pybind11啦
+&lt;/h2></description></item></channel></rss>

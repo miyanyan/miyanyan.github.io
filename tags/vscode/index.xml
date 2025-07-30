@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Vscode on miyan的博客</title><link>https://miyan.site/tags/vscode/</link><description>Recent content in Vscode on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 30 Jul 2025 10:36:36 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/vscode/index.xml" rel="self" type="application/rss+xml"/><item><title>vscode cmake 设置</title><link>https://miyan.site/p/vscode-cmake-%E8%AE%BE%E7%BD%AE/</link><pubDate>Fri, 11 Jul 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/vscode-cmake-%E8%AE%BE%E7%BD%AE/</guid><description>&lt;ol>
+&lt;li>
+&lt;p>配置CMAKE_TOOLCHAIN_FILE为vcpkg&lt;/p>
+&lt;p>打开vscode的设置界面，搜索&lt;code>cmake.configureSettings&lt;/code>，点击&lt;code>Edit in settings.json&lt;/code>并添加：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;cmake.configureSettings&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;CMAKE_TOOLCHAIN_FILE&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>配置generator为Ninja
+打开vscode的设置界面，搜索&lt;code>cmake.generator&lt;/code>，填入&lt;code>Ninja&lt;/code>即可。&lt;/p>
+&lt;/li>
+&lt;/ol></description></item><item><title>vscode python 设置</title><link>https://miyan.site/p/vscode-python-%E8%AE%BE%E7%BD%AE/</link><pubDate>Fri, 30 May 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/vscode-python-%E8%AE%BE%E7%BD%AE/</guid><description>&lt;p>参考&lt;a class="link" href="https://code.visualstudio.com/docs/python/settings-reference" target="_blank" rel="noopener"
+>Python settings reference&lt;/a>&lt;/p>
+&lt;ol>
+&lt;li>python pyi 文件的搜索目录
+pyi文件用于提示IDE自动补全和高亮，在vscode中对应&lt;code>stubPath&lt;/code>这个参数，它的默认值是&lt;code>./typings&lt;/code>，也就是根目录的typings文件夹，所以把所有的pyi文件放到该目录就可以使vscode里的python代码自动提示并高亮了&lt;/li>
+&lt;/ol></description></item><item><title>vscode/visual studio 快捷建设置</title><link>https://miyan.site/p/vscode/visual-studio-%E5%BF%AB%E6%8D%B7%E5%BB%BA%E8%AE%BE%E7%BD%AE/</link><pubDate>Tue, 25 Mar 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/vscode/visual-studio-%E5%BF%AB%E6%8D%B7%E5%BB%BA%E8%AE%BE%E7%BD%AE/</guid><description>&lt;ol>
+&lt;li>切换头文件/源文件(&lt;strong>F4&lt;/strong>)
+&lt;ul>
+&lt;li>vscode: c++插件搜索&lt;code>switchheadersource&lt;/code>(注意不加空格，这样自带的c++和clangd都能搜索出来)&lt;/li>
+&lt;li>visual studio: 搜索&lt;code>切换标题代码文件&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol></description></item><item><title>vscode clangd 设置</title><link>https://miyan.site/p/vscode-clangd-%E8%AE%BE%E7%BD%AE/</link><pubDate>Fri, 14 Mar 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/vscode-clangd-%E8%AE%BE%E7%BD%AE/</guid><description>&lt;ol>
+&lt;li>
+&lt;p>禁用microsoft c++插件的提示
+打开vscode的设置界面，搜索&lt;code>c++ engine&lt;/code>，选择&lt;code>C_Cpp.intelliSenseEngine&lt;/code>，设置为&lt;code>disabled&lt;/code>&lt;/p>
+&lt;p>对应的settings.json设置为&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;C_Cpp.intelliSenseEngine&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;disabled&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>添加clangd参数&lt;/p>
+&lt;ul>
+&lt;li>不自动添加头文件&lt;/li>
+&lt;li>补全时不自动填写函数参数&lt;/li>
+&lt;/ul>
+&lt;p>打开vscode的设置界面，搜索&lt;code>clangd arguments&lt;/code>，选择&lt;code>clangd.arguments&lt;/code>，点击&lt;code>Add Item&lt;/code>添加对应参数。&lt;/p>
+&lt;p>对应的settings.json设置为&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;clangd.arguments&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;--header-insertion=never&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;--function-arg-placeholders=0&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol></description></item></channel></rss>
