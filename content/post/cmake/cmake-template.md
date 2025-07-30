@@ -183,8 +183,8 @@ tags:
                 
                 # 排除隐藏目录
                 if(NOT lib_name MATCHES "^\\.")
-                    add_custom_command(TARGET _vcpkg_license_copy
-                        COMMAND ${CMAKE_COMMAND} -E copy
+                    add_custom_command(TARGET _vcpkg_license_copy POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
                             "${license_dir}/copyright"
                             "${ARG_OUTPUT_DIR}/${lib_name}.LICENSE"
                         COMMENT "Copying ${lib_name} license"
