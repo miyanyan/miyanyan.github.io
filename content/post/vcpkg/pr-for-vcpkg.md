@@ -258,3 +258,9 @@ highfive:arm64-uwp = cascade
 highfive:x64-uwp = cascade
 highfive[opencv]:arm64-windows = cascade
 ```
+
+### 如何在vcpkg中更新boost
+
+我最开始更新[boost 1.87.0](https://github.com/microsoft/vcpkg/pull/42678) 时是傻乎乎的一个个的更新的，后来才发现官方有脚本的......
+
+脚本路径为`vcpkg/scripts/boost/generate-ports.ps1`
