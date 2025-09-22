@@ -201,3 +201,14 @@ tags:
         add_dependencies(${ARG_TARGET_NAME} _vcpkg_license_copy)
     endfunction()
     ```
+
+13. 开启ccache
+    ```cmake
+    # Configure CCache if available
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        message(STATUS "Set up ccache ...")
+        set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    endif()
+    ```
