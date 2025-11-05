@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Claude-Code on miyan的博客</title><link>https://miyan.site/tags/claude-code/</link><description>Recent content in Claude-Code on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 05 Nov 2025 20:29:25 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/claude-code/index.xml" rel="self" type="application/rss+xml"/><item><title>【程序员的工具】在手机上使用Termux和Claude Code</title><link>https://miyan.site/p/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%B7%A5%E5%85%B7%E5%9C%A8%E6%89%8B%E6%9C%BA%E4%B8%8A%E4%BD%BF%E7%94%A8termux%E5%92%8Cclaude-code/</link><pubDate>Wed, 05 Nov 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%B7%A5%E5%85%B7%E5%9C%A8%E6%89%8B%E6%9C%BA%E4%B8%8A%E4%BD%BF%E7%94%A8termux%E5%92%8Cclaude-code/</guid><description>&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;作为一名程序员，我们经常需要随时随地处理代码或者进行开发工作。虽然笔记本电脑便携性不错，但有时候我们可能只想用手机来处理一些简单的编程任务。今天我要介绍如何在Android手机上通过Termux配置一个完整的Claude Code开发环境，让你真正做到&amp;quot;手机就是开发机&amp;quot;！&lt;/p&gt;
+&lt;h2 id="什么是termux"&gt;什么是Termux
+&lt;/h2&gt;&lt;p&gt;Termux是一个Android终端模拟器和Linux环境应用程序，它可以直接在手机上运行许多Linux命令行工具，无需root权限。通过Termux，我们可以在手机上拥有一个功能强大的命令行环境。&lt;/p&gt;
+&lt;h2 id="安装termux"&gt;安装Termux
+&lt;/h2&gt;&lt;p&gt;首先需要安装Termux应用。由于Google Play上的Termux版本比较老旧，推荐从GitHub下载最新版本：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;访问 &lt;a class="link" href="https://github.com/termux/termux-app/releases" target="_blank" rel="noopener"
+&gt;Termux GitHub Releases&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;下载适合你手机架构的APK文件，通常选择 &lt;code&gt;termux-app_v0.118.3+github-debug_arm64-v8a.apk&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;在手机上安装该APK文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="配置termux环境"&gt;配置Termux环境
+&lt;/h2&gt;&lt;p&gt;安装完成后，打开Termux应用，首先更新软件包列表和已安装的软件包：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pkg update &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; pkg upgrade
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后安装必要的开发工具：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pkg install nodejs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pkg install git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="安装claude-code"&gt;安装Claude Code
+&lt;/h2&gt;&lt;p&gt;Claude Code是Anthropic官方提供的命令行工具，可以让我们直接在终端中与Claude进行交互。通过npm安装：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;npm install -g @anthropic-ai/claude-code
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="配置api密钥"&gt;配置API密钥
+&lt;/h2&gt;&lt;p&gt;要使用Claude Code，需要配置API密钥。如果你有Anthropic的API密钥，可以直接使用。如果没有，可以使用第三方API服务, 这里以glm为例：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;ANTHROPIC_BASE_URL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;https://open.bigmodel.cn/api/anthropic
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;ANTHROPIC_AUTH_TOKEN&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;YOUR_API_KEY
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;将 &lt;code&gt;YOUR_API_KEY&lt;/code&gt; 替换为你的实际API密钥。&lt;/p&gt;
+&lt;p&gt;为了方便使用，可以将这些环境变量添加到shell配置文件中：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;export ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; ~/.bashrc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;export ANTHROPIC_AUTH_TOKEN=YOUR_API_KEY&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; ~/.bashrc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;source&lt;/span&gt; ~/.bashrc
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="使用claude-code"&gt;使用Claude Code
+&lt;/h2&gt;&lt;p&gt;配置完成后，就可以直接使用Claude Code了：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;claude
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果配置正确，你应该能看到Claude Code的启动界面。&lt;/p&gt;</description></item></channel></rss>

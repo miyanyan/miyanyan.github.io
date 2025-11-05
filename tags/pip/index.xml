@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pip on miyan的博客</title><link>https://miyan.site/tags/pip/</link><description>Recent content in Pip on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 10 May 2025 18:26:21 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/pip/index.xml" rel="self" type="application/rss+xml"/><item><title>python requirements.txt 里指定操作系统和python版本</title><link>https://miyan.site/p/python-requirements.txt-%E9%87%8C%E6%8C%87%E5%AE%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%92%8Cpython%E7%89%88%E6%9C%AC/</link><pubDate>Wed, 16 Nov 2022 00:00:00 +0000</pubDate><guid>https://miyan.site/p/python-requirements.txt-%E9%87%8C%E6%8C%87%E5%AE%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%92%8Cpython%E7%89%88%E6%9C%AC/</guid><description>&lt;p&gt;在给&lt;a class="link" href="https://github.com/TBC-TJU/MetaBCI/blob/master/requirements.txt" target="_blank" rel="noopener"
+&gt;MetaBCI&lt;/a&gt;编写github ci时发现在不同的平台下依赖不尽相同，版本要求不尽相同，在这里记录下&lt;/p&gt;
+&lt;p&gt;参考&lt;a class="link" href="https://pip.pypa.io/en/stable/reference/requirement-specifiers/" target="_blank" rel="noopener"
+&gt;https://pip.pypa.io/en/stable/reference/requirement-specifiers/&lt;/a&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-txt" data-lang="txt"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# ---------------------------------
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# System platform value
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# ---------------------------------
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# AIX &amp;#34;aix&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# Linux &amp;#34;linux&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# Windows &amp;#34;win32&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# Windows/Cygwin &amp;#34;cygwin&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# MacOS &amp;#34;darwin&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# ---------------------------------
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;atomac==1.1.0; sys_platform == &amp;#39;darwin&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;futures&amp;gt;=3.0.5; python_version &amp;lt; &amp;#39;3.0&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;futures&amp;gt;=3.0.5; python_version == &amp;#39;2.6&amp;#39; or python_version==&amp;#39;2.7&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item></channel></rss>
