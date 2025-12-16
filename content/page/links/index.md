@@ -18,6 +18,9 @@ comments: false
 ---
 
 记录有用的网站链接
+## vcpkg
+* https://devblogs.microsoft.com/cppblog/using-system-package-manager-dependencies-with-vcpkg/#using-curl-and-openssl-from-the-system-package-manager
+* https://learn.microsoft.com/en-us/vcpkg/users/triplets#vcpkg_env_passthrough
 
 <!-- To use this feature, add `links` section to frontmatter.
 
