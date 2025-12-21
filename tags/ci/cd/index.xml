@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CI/CD on miyan的博客</title><link>https://miyan.site/tags/ci/cd/</link><description>Recent content in CI/CD on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sun, 11 May 2025 12:00:01 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/ci/cd/index.xml" rel="self" type="application/rss+xml"/><item><title>[gitlab ci] 怎么使用本地的docker image</title><link>https://miyan.site/p/gitlab-ci-%E6%80%8E%E4%B9%88%E4%BD%BF%E7%94%A8%E6%9C%AC%E5%9C%B0%E7%9A%84docker-image/</link><pubDate>Mon, 02 Sep 2024 00:00:00 +0000</pubDate><guid>https://miyan.site/p/gitlab-ci-%E6%80%8E%E4%B9%88%E4%BD%BF%E7%94%A8%E6%9C%AC%E5%9C%B0%E7%9A%84docker-image/</guid><description>&lt;p&gt;每次跑gitlab ci都需要pull一个镜像很费时间，则可以修改gitlab-runner的参数&lt;/p&gt;
+&lt;p&gt;修改config.toml文件中的[[runners]] [runners.docker] pull_policy = &amp;ldquo;if-not-present&amp;rdquo;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-toml" data-lang="toml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="nx"&gt;runners&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;runners&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;docker&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;pull_policy&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;if-not-present&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;参考：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.gitlab.com/runner/executors/docker.html#how-pull-policies-work" target="_blank" rel="noopener"
+&gt;https://docs.gitlab.com/runner/executors/docker.html#how-pull-policies-work&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://stackoverflow.com/questions/63043714/gitlab-runner-pulls-image-for-every-job" target="_blank" rel="noopener"
+&gt;https://stackoverflow.com/questions/63043714/gitlab-runner-pulls-image-for-every-job&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

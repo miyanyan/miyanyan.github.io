@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Visual Studio on miyan的博客</title><link>https://miyan.site/tags/visual-studio/</link><description>Recent content in Visual Studio on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 10 May 2025 18:26:21 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/visual-studio/index.xml" rel="self" type="application/rss+xml"/><item><title>vscode/visual studio 快捷建设置</title><link>https://miyan.site/p/vscode/visual-studio-%E5%BF%AB%E6%8D%B7%E5%BB%BA%E8%AE%BE%E7%BD%AE/</link><pubDate>Tue, 25 Mar 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/vscode/visual-studio-%E5%BF%AB%E6%8D%B7%E5%BB%BA%E8%AE%BE%E7%BD%AE/</guid><description>&lt;ol&gt;
+&lt;li&gt;切换头文件/源文件(&lt;strong&gt;F4&lt;/strong&gt;)
+&lt;ul&gt;
+&lt;li&gt;vscode: c++插件搜索&lt;code&gt;switchheadersource&lt;/code&gt;(注意不加空格，这样自带的c++和clangd都能搜索出来)&lt;/li&gt;
+&lt;li&gt;visual studio: 搜索&lt;code&gt;切换标题代码文件&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</description></item></channel></rss>

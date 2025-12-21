@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Vcpkg on miyan的博客</title><link>https://miyan.site/categories/vcpkg/</link><description>Recent content in Vcpkg on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sun, 17 Aug 2025 11:41:03 +0800</lastBuildDate><atom:link href="https://miyan.site/categories/vcpkg/index.xml" rel="self" type="application/rss+xml"/><item><title>如何给vcpkg提pr</title><link>https://miyan.site/p/%E5%A6%82%E4%BD%95%E7%BB%99vcpkg%E6%8F%90pr/</link><pubDate>Sun, 17 Nov 2024 00:00:00 +0000</pubDate><guid>https://miyan.site/p/%E5%A6%82%E4%BD%95%E7%BB%99vcpkg%E6%8F%90pr/</guid><description>&lt;p&gt;笔者偶尔会给vcpkg提交一些包的更新，这里记录下遇到的问题，与大家分享，如能起到一点点帮助那我就更开心了。&lt;/p&gt;
+&lt;p&gt;首先是github提pr的基本流程，这里假设大家都已经知道了，此为前提。&lt;/p&gt;
+&lt;h2 id="更新包"&gt;更新包
+&lt;/h2&gt;&lt;h3 id="更新版本"&gt;更新版本
+&lt;/h3&gt;&lt;p&gt;以&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/39738" target="_blank" rel="noopener"
+&gt;fmt&lt;/a&gt;为例，我们这次的目的要更新fmt的版本号到&lt;code&gt;11.0.2&lt;/code&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;在vcpkg的路径ports文件夹下找到要更新的包，为例，那么我们就要找到文件夹&lt;code&gt;vcpkg/ports/fmt&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在这个文件夹下有两个主要文件，也就是我们要修改的地方&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;vcpkg.json&lt;/code&gt; 这个文件对fmt包进行了基本的描述，因为我们主要关注版本的更新，所以我们主要看参数&lt;code&gt;version&lt;/code&gt;和&lt;code&gt;port-version&lt;/code&gt;&lt;br&gt;
+&lt;code&gt;version&lt;/code&gt;对应版本号，把它更新为&lt;code&gt;11.0.2&lt;/code&gt;; &lt;code&gt;port-version&lt;/code&gt;为当前版本的修改号，一般的，当我们更新版本时要去掉&lt;code&gt;port-version&lt;/code&gt;(port-version将在下一节修复问题时用到)&lt;/p&gt;
+&lt;p&gt;好了，更新完后应该是这样子的&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;fmt&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;version&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;11.0.2&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt; &lt;span class="err"&gt;&amp;lt;---&lt;/span&gt; &lt;span class="err"&gt;更新了这里的版本号。VVV&lt;/span&gt; &lt;span class="err"&gt;下面没有port-version&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;{fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;homepage&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;https://github.com/fmtlib/fmt&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;license&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;MIT&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;dependencies&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;vcpkg-cmake&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;host&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;vcpkg-cmake-config&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;host&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;portfile.cmake&lt;/code&gt; 这个文件对fmt怎么用cmake构建进行了描述，因为我们主要关注版本的更新，所以我们只看文件里的&lt;code&gt;vcpkg_from_github&lt;/code&gt;函数，这个函数里有两个要改的变量&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;REF&lt;/code&gt; vcpkg是根据&lt;code&gt;REF&lt;/code&gt;的值去判断下载github上的哪个版本的release去编译的，如果你发现&lt;code&gt;REF&lt;/code&gt;的值是&lt;code&gt;&amp;quot;${VERSION}&amp;quot;&lt;/code&gt;，
+那么这里一般就不需要改了，否则你需要把它改成版本号(当然，你提pr的时候就会发现vcpkg的官方人员会提醒你使用&lt;code&gt;&amp;quot;${VERSION}&amp;quot;&lt;/code&gt;，减少一处改动何乐而不为呢哈哈)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SHA512&lt;/code&gt; 这个值是github上release的压缩包的哈希值，用于校验下载的文件是否正确。那么怎么得到这个哈希值呢?
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在vcpkg的根目录下执行&lt;code&gt;vcpkg install fmt&lt;/code&gt;， 等待一段时间，vcpkg会报错，在报错信息里找到这两行：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-cmake" data-lang="cmake"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;Expected&lt;/span&gt; &lt;span class="err"&gt;hash:&lt;/span&gt; &lt;span class="err"&gt;xxxxx
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;Actual&lt;/span&gt; &lt;span class="err"&gt;hash:&lt;/span&gt; &lt;span class="err"&gt;47ff6d289dcc22681eea6da465b0348172921e7cafff8fd57a1540d3232cc6b53250a4625c954ee0944c87963b17680ecbc3ea123e43c2c822efe0dc6fa6cef3
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;看到没，这个Actual hash的值就是你要修改的&lt;code&gt;SHA512&lt;/code&gt;的值了，复制过来。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在vcpkg的根目录下再次执行&lt;code&gt;vcpkg install fmt&lt;/code&gt;，如果没有报错那么恭喜你，更新包的流程就完成了一大半了！&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;好了，更新完后应该是这样子的&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-cmake" data-lang="cmake"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;vcpkg_from_github&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;OUT_SOURCE_PATH&lt;/span&gt; &lt;span class="s"&gt;SOURCE_PATH&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;REPO&lt;/span&gt; &lt;span class="s"&gt;fmtlib/fmt&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;REF&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;${VERSION}&amp;#34;&lt;/span&gt; &lt;span class="c"&gt;# &amp;lt;--- 无需修改
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;SHA512&lt;/span&gt; &lt;span class="s"&gt;47ff6d289dcc22681eea6da465b0348172921e7cafff8fd57a1540d3232cc6b53250a4625c954ee0944c87963b17680ecbc3ea123e43c2c822efe0dc6fa6cef3&lt;/span&gt; &lt;span class="c"&gt;# &amp;lt;--- 必须修改哈希值
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;HEAD_REF&lt;/span&gt; &lt;span class="s"&gt;master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将刚才的修改git commit&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在vcpkg的根目录下执行&lt;code&gt;vcpkg x-add-version --all&lt;/code&gt;，这会修改vcpkg用于记录的数据库，对应两个文件&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;versions/f-/fmt.json&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;versions/baseline.json&lt;/code&gt;
+当然，这两个文件的改动是自动修改的，再次git commit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将git修改提交到vcpkg的pull request中&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="修复当前版本的问题"&gt;修复当前版本的问题
+&lt;/h3&gt;&lt;p&gt;很多时候不是简简单单更新个版本号就能正确更新的，某些包的更新可能会导致依赖于此包的其他包编译报错，某些包的更新可能会引入自己的新bug等等&amp;hellip;&lt;/p&gt;
+&lt;p&gt;我们还是以&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/39738" target="_blank" rel="noopener"
+&gt;fmt&lt;/a&gt;为例，当fmt从v10升级到v11后，有很多大的改动，
+比如要使用fmt的join函数，必须要显式的&lt;code&gt;#include &amp;lt;fmt/ranges.h&amp;gt;&lt;/code&gt;，这会导致libtorch编译报错，我们需要修改libtorch相关的报错文件，在其文件中&lt;code&gt;#include &amp;lt;fmt/ranges.h&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;那么要怎么做呢，我们的核心思想就是对这次修复形成一个commit，利用git的patch机制生成一个patch文件，最终在构建时将这个patch文件引入进来，从而解决编译报错等问题。&lt;/p&gt;
+&lt;p&gt;参考&lt;a class="link" href="https://github.com/Microsoft/vcpkg-docs/blob/main/vcpkg/examples/patching.md" target="_blank" rel="noopener"
+&gt;https://github.com/Microsoft/vcpkg-docs/blob/main/vcpkg/examples/patching.md&lt;/a&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;为libtorch创建git本地仓库&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;执行&lt;code&gt;vcpkg install libtorch&lt;/code&gt;，此时由于fmt的更新会导致编译报错，没错就是缺少&lt;code&gt;#include &amp;lt;fmt/ranges.h&amp;gt;&lt;/code&gt;导致的报错。我们找到vcpkg下载下来的libtorch的源文件目录&lt;br&gt;
+&lt;code&gt;vcpkg/buildtrees/libtorch/src&lt;/code&gt;这个目录下存储着libtorch每次的下载缓存，一般的我们选最新的那个目录并进入该目录&lt;/li&gt;
+&lt;li&gt;执行&lt;code&gt;git init .&lt;/code&gt;初始化本地仓库&lt;/li&gt;
+&lt;li&gt;执行&lt;code&gt;git add .&lt;/code&gt;把libtorch的所有原文件加入暂存区&lt;/li&gt;
+&lt;li&gt;执行&lt;code&gt;git commit -m &amp;quot;temp&amp;quot;&lt;/code&gt;把所有原文件提交&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改libtorch的编译报错问题
+这里我们已经知道了要显式的&lt;code&gt;#include &amp;lt;fmt/ranges.h&amp;gt;&lt;/code&gt;，直接找到对应的文件修改吧！&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;为修改完的文件生成patch&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;执行&lt;code&gt;git status&lt;/code&gt;可以看到我们修改的文件，确认修改无误&lt;/li&gt;
+&lt;li&gt;执行&lt;code&gt;git diff --ignore-space-at-eol | out-file -enc ascii ..\..\..\..\ports\libtorch\fix-build-error-with-fmt11.patch&lt;/code&gt;即可把patch文件生成到&lt;code&gt;vcpkg/ports/libtorch&lt;/code&gt;下，
+这个文件长这样&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/39738/files#diff-20152fea9680d25580927f0beb5e3353810aef44c5dfe4c505e5c2a46f60b699" target="_blank" rel="noopener"
+&gt;fix-build-error-with-fmt11.patch&lt;/a&gt;&lt;br&gt;
+注意，vcpkg的官方人员会要求你文件用&lt;code&gt;LF&lt;/code&gt;而不是&lt;code&gt;CRLF&lt;/code&gt;，记得确定&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在&lt;code&gt;portfile.cmake&lt;/code&gt;文件中添加该patch&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-cmake" data-lang="cmake"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;vcpkg_from_github&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c"&gt;# 其他参数...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;PATCHES&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;fix-build-error-with-fmt11.patch&lt;/span&gt; &lt;span class="c"&gt;# &amp;lt;-- 这里就是生成的patch文件了
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;验证行patch是否能解决问题
+再次执行&lt;code&gt;vcpkg install libtorch&lt;/code&gt;，如果没有报错那么就是成功了！&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将&lt;code&gt;vcpkg.json&lt;/code&gt;文件中的&lt;code&gt;port-version&lt;/code&gt;号加1，如果没有&lt;code&gt;port-version&lt;/code&gt;则说明当前的&lt;code&gt;port-version&lt;/code&gt;号为0&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将刚才的修改git commit&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在vcpkg的根目录下执行&lt;code&gt;vcpkg x-add-version --all&lt;/code&gt;，再次git commit&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将git修改提交到vcpkg的pull request中&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="添加包"&gt;添加包
+&lt;/h2&gt;&lt;p&gt;如果你已经知道了如何更新包，那么你肯定熟悉了vcpkg的目录结构，这里我们再复述一下，vcpkg目录下的&lt;code&gt;ports/&amp;lt;your-port-name&amp;gt;&lt;/code&gt;主要包含两个文件：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;portfile.cmake: 如何用cmake编译&lt;/li&gt;
+&lt;li&gt;vcpkg.json: 这个包的依赖关系等描述&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;接下来我们以添加&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/42969" target="_blank" rel="noopener"
+&gt;ucoro&lt;/a&gt;到vcpkg为例&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;在ports文件夹下新建ucoro文件夹&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在ucoro文件夹下添加portfile.cmake和vcpkg.json两个文件。(我一般是找个就近的包把它的这俩文件copy过来)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改vcpkg.json文件内容，主要是名称、版本号、描述、网址、许可证、依赖&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改portfile.cmake文件，一般的，我们把下面的每一个函数都调用一下总不会错&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果是header-only的库，那么就在第一行添加&lt;code&gt;set(VCPKG_BUILD_TYPE release)&lt;/code&gt;，这样不会有debug的文件目录生成，ucoro就是一个header-only的库，这里我加上了这一行。&lt;/li&gt;
+&lt;li&gt;使用&lt;a class="link" href="https://learn.microsoft.com/en-us/vcpkg/maintainers/functions/vcpkg_from_github" target="_blank" rel="noopener"
+&gt;vcpkg_from_github&lt;/a&gt;从github下载ucoro的release文件&lt;/li&gt;
+&lt;li&gt;使用&lt;a class="link" href="https://learn.microsoft.com/en-us/vcpkg/maintainers/functions/vcpkg_cmake_configure" target="_blank" rel="noopener"
+&gt;vcpkg_cmake_configure&lt;/a&gt;传入项目编译的cmake参数&lt;/li&gt;
+&lt;li&gt;使用&lt;a class="link" href="https://learn.microsoft.com/en-us/vcpkg/maintainers/functions/vcpkg_cmake_install" target="_blank" rel="noopener"
+&gt;vcpkg_cmake_install&lt;/a&gt;调用cmake install命令安装库&lt;/li&gt;
+&lt;li&gt;使用&lt;a class="link" href="https://learn.microsoft.com/en-us/vcpkg/maintainers/functions/vcpkg_cmake_config_fixup" target="_blank" rel="noopener"
+&gt;vcpkg_cmake_config_fixup&lt;/a&gt;确保生成的cmake安装文件符合vcpkg的要求&lt;/li&gt;
+&lt;li&gt;使用&lt;a class="link" href="https://learn.microsoft.com/en-us/vcpkg/maintainers/functions/vcpkg_fixup_pkgconfig" target="_blank" rel="noopener"
+&gt;vcpkg_fixup_pkgconfig&lt;/a&gt;修复 *.pc 文件中的通用路径&lt;/li&gt;
+&lt;li&gt;使用&lt;code&gt;file(INSTALL &amp;quot;${SOURCE_PATH}/LICENSE_1_0.txt&amp;quot; DESTINATION &amp;quot;${CURRENT_PACKAGES_DIR}/share/${PORT}&amp;quot; RENAME copyright)&lt;/code&gt;复制ucoro的license到目标目录&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;好了，现在就和上面的更新包操作一样，使用&lt;code&gt;vcpkg install ucoro&lt;/code&gt;直到vcpkg不再报错和警告即大功告成，最终的port.cmake文件如下，可以看到我还添加了一个cmake-install.patch文件，这是因为ucoro的cmake文件里没有写cmake install指令，当然cmake语法这里不做介绍。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-cmake" data-lang="cmake"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;set&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;VCPKG_BUILD_TYPE&lt;/span&gt; &lt;span class="s"&gt;release&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c"&gt;# header-only
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;vcpkg_from_github&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;OUT_SOURCE_PATH&lt;/span&gt; &lt;span class="s"&gt;SOURCE_PATH&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;REPO&lt;/span&gt; &lt;span class="s"&gt;avplayer/ucoro&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;REF&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;v${VERSION}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;SHA512&lt;/span&gt; &lt;span class="s"&gt;c3436b436ef1ebb3d47a65db9603842293bdb6451bc6fb738a63d61a63b52901e223f46625d956303566dc52dfb38ffb2c6ce20016c18b444f9cb3e2e701e613&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;HEAD_REF&lt;/span&gt; &lt;span class="s"&gt;main&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;PATCHES&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;cmake-install.patch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;vcpkg_cmake_configure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;SOURCE_PATH&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;${SOURCE_PATH}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;OPTIONS&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;-DUCORO_BUILD_TESTING=OFF&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;vcpkg_cmake_install&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;vcpkg_cmake_config_fixup&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;vcpkg_fixup_pkgconfig&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;file&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;INSTALL&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;${SOURCE_PATH}/LICENSE_1_0.txt&amp;#34;&lt;/span&gt; &lt;span class="s"&gt;DESTINATION&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;${CURRENT_PACKAGES_DIR}/share/${PORT}&amp;#34;&lt;/span&gt; &lt;span class="s"&gt;RENAME&lt;/span&gt; &lt;span class="s"&gt;copyright&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;和更新包的操作一样，git commit并提交pr吧！&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="常见问题"&gt;常见问题
+&lt;/h2&gt;&lt;h3 id="有的包生成的pc文件里有绝对路径导致vcpkg的ci报错"&gt;有的包生成的.pc文件里有绝对路径，导致vcpkg的ci报错
+&lt;/h3&gt;&lt;p&gt;使用&lt;a class="link" href="https://learn.microsoft.com/zh-cn/vcpkg/maintainers/functions/vcpkg_fixup_pkgconfig" target="_blank" rel="noopener"
+&gt;vcpkg_fixup_pkgconfig()&lt;/a&gt;进行修复，如&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/42158" target="_blank" rel="noopener"
+&gt;更新magic-enum&lt;/a&gt;时我发现之前的portfile.cmake里并未对pc文件进行修复&lt;/p&gt;
+&lt;h3 id="某个包的当前版本的bug需要修复如何添加patch"&gt;某个包的当前版本的bug需要修复，如何添加patch
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;这个bug已经被修复了，只是没有更新到这个版本&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;首先我们找到这个bug修复对应的commit，这里我们以&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/39738" target="_blank" rel="noopener"
+&gt;更新fmt到11&lt;/a&gt;为例，在这个pr里我发现fmt的更新导致folly编译报错，具体原因忽略，这个编译报错被修复对应的commit为&lt;a class="link" href="https://github.com/facebook/folly/commit/21e8dcd464ee46b2144a1e4d4c0e452355ae15f0" target="_blank" rel="noopener"
+&gt;https://github.com/facebook/folly/commit/21e8dcd464ee46b2144a1e4d4c0e452355ae15f0&lt;/a&gt;，我们进入到这个commit对应的链接，可以看到修改的git diff。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;但是！咱们现在要的是一个可以用的patch文件，这里就需要加入一点github官方文档未提供的方法了(也许提供了但是我没找到？)，在这个commit链接后面加上&lt;code&gt;.patch&lt;/code&gt;，即&lt;a class="link" href="https://github.com/facebook/folly/commit/21e8dcd464ee46b2144a1e4d4c0e452355ae15f0.patch" target="_blank" rel="noopener"
+&gt;https://github.com/facebook/folly/commit/21e8dcd464ee46b2144a1e4d4c0e452355ae15f0.patch&lt;/a&gt;，可以发现现在是纯文本了，接下来还要在最后加上&lt;code&gt;?full_index=1&lt;/code&gt;，按讨论区的说法，加上这个之后可以保证链接的稳定。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;You have to add ?full_index=1 to the URL to get a full commit hash in the patch, otherwise the number of characters used to write the commit in the patch will grow as the project grows.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;参考&lt;a class="link" href="https://github.com/orgs/community/discussions/46034#discussioncomment-4846112" target="_blank" rel="noopener"
+&gt;https://github.com/orgs/community/discussions/46034#discussioncomment-4846112&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;patch文件搞定了，接下来就是把这个链接放到vcpkg的portfile.cmake文件中，调用&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/39738/files#diff-43a3685f2f444b4804fbb55de14055069de61e824ca3fc9ae9b27fb5ffd16a32R8-R13" target="_blank" rel="noopener"
+&gt;vcpkg_download_distfile&lt;/a&gt;把文件下载下来，&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-cmake" data-lang="cmake"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;vcpkg_download_distfile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;FMT11_RANGE_PATCH&lt;/span&gt; &lt;span class="c"&gt;# 这里给patch起个名称
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;URLS&lt;/span&gt; &lt;span class="s"&gt;https://github.com/facebook/folly/commit/21e8dcd464ee46b2144a1e4d4c0e452355ae15f0.patch?full_index=1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;FILENAME&lt;/span&gt; &lt;span class="s"&gt;fmt11-range.patch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;SHA512&lt;/span&gt; &lt;span class="s"&gt;6a3afe361cd24b4f62b3aba625dfbbfb767c91f27fa45ed4604adc5ec3d574e571ece13eeda0d9d47b8a37166fc31b1ed7f58f120a35d35977085a08172de105&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;并在&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/39738/files#diff-43a3685f2f444b4804fbb55de14055069de61e824ca3fc9ae9b27fb5ffd16a32R27" target="_blank" rel="noopener"
+&gt;vcpkg_from_github&lt;/a&gt;中设置这个文件为对应的patch。至此完成了拉取上游修改并添加为patch的操作。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-cmake" data-lang="cmake"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;vcpkg_from_github&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;OUT_SOURCE_PATH&lt;/span&gt; &lt;span class="s"&gt;SOURCE_PATH&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;REPO&lt;/span&gt; &lt;span class="s"&gt;facebook/folly&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;REF&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;v${VERSION}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;SHA512&lt;/span&gt; &lt;span class="s"&gt;f129d4e530b5c8aaf4cbfb0c813e84ee911ec26e43fa01e6e1c9557501c605a8123d46d0c689b32eb5e5a57280968662a5fa370ede17af7526db59545e9a70db&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;HEAD_REF&lt;/span&gt; &lt;span class="s"&gt;main&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;PATCHES&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;disable-non-underscore-posix-names.patch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;fix-windows-minmax.patch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;fix-deps.patch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;disable-uninitialized-resize-on-new-stl.patch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;fix-unistd-include.patch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s"&gt;fix-fmt11-cmake.patch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;FMT11_RANGE_PATCH&lt;/span&gt;&lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="c"&gt;# 这里就是下载下来的patch
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="如何在vcpkg的ci检查中跳过某些检查"&gt;如何在vcpkg的ci检查中跳过某些检查
+&lt;/h3&gt;&lt;p&gt;在&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/40984" target="_blank" rel="noopener"
+&gt;更新fastdds&lt;/a&gt;时我遇到了fastdds在老版本的android上由于缺少依赖编译不过去的问题&lt;/p&gt;
+&lt;p&gt;官方的回复也是说针对这种情况要在ci里跳过检查&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;CI is instructed to skip many ports which required API level 24 for android&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;主要修改的地方为文件&lt;code&gt;scripts/ci.baseline.txt&lt;/code&gt;
+在这个文件里添加希望跳过的检查：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fastdds:arm-neon-android=fail
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fastdds:arm64-android=fail
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fastdds:x64-android=fail
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;在&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/46268" target="_blank" rel="noopener"
+&gt;更新highifive&lt;/a&gt;时我遇到了highfive的feature在ci上通过了确被忽略的报错，报错信息为：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;D:\a\_work\1\s\scripts\azure-pipelines/../ci.feature.baseline.txt:954:1: error: highfive[core]:arm64-windows passed but was marked expected to be a cascaded failure
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;D:\a\_work\1\s\scripts\azure-pipelines/../ci.feature.baseline.txt:954:1: error: highfive[core,eigen3]:arm64-windows passed but was marked expected to be a cascaded failure
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;D:\a\_work\1\s\scripts\azure-pipelines/../ci.feature.baseline.txt:954:1: error: highfive[core,xtensor]:arm64-windows passed but was marked expected to be a cascaded failure
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;D:\a\_work\1\s\scripts\azure-pipelines/../ci.feature.baseline.txt:954:1: error: highfive[core,boost]:arm64-windows passed but was marked expected to be a cascaded failure
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这里的意思就是feature通过了但是被标记为了理应失败，对应修改的地方为文件&lt;code&gt;scripts/ci.feature.baseline.txt&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;highfive:arm64-uwp = cascade
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;highfive:x64-uwp = cascade
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;highfive[opencv]:arm64-windows = cascade
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="如何在vcpkg中更新boost"&gt;如何在vcpkg中更新boost
+&lt;/h3&gt;&lt;p&gt;我最开始更新&lt;a class="link" href="https://github.com/microsoft/vcpkg/pull/42678" target="_blank" rel="noopener"
+&gt;boost 1.87.0&lt;/a&gt; 时是傻乎乎的一个个的更新的，后来才发现官方有脚本的&amp;hellip;&amp;hellip;&lt;/p&gt;
+&lt;p&gt;脚本路径为&lt;code&gt;vcpkg/scripts/boost/generate-ports.ps1&lt;/code&gt;, 注意要使用PowerShell 6 或更高版本，否则会报错。&lt;/p&gt;</description></item></channel></rss>
