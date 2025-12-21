@@ -98,194 +98,134 @@ C++ 的六种内存序（从弱到强）：C++11 定义了 6 种内存序，按�
 
 最终实现如下(folly的实现)：
 ```c++
-/*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#pragma once
-
-#include <atomic>
-#include <cassert>
-#include <cstdlib>
-#include <memory>
-#include <stdexcept>
-#include <type_traits>
-#include <utility>
-
-#include <folly/concurrency/CacheLocality.h>
-
-namespace folly {
-
-/*
- * ProducerConsumerQueue is a one producer and one consumer queue
- * without locks.
- */
-template <class T>
-struct ProducerConsumerQueue {
-  using value_type = T;
-
-  ProducerConsumerQueue(const ProducerConsumerQueue&) = delete;
-  ProducerConsumerQueue& operator=(const ProducerConsumerQueue&) = delete;
-
-  // size must be >= 2.
-  //
-  // Also, note that the number of usable slots in the queue at any
-  // given time is actually (size-1), so if you start with an empty queue,
-  // isFull() will return true after size-1 insertions.
-  explicit ProducerConsumerQueue(uint32_t size)
-      : size_(size),
-        records_(static_cast<T*>(std::malloc(sizeof(T) * size))),
-        readIndex_(0),
-        writeIndex_(0) {
-    assert(size >= 2);
-    if (!records_) {
-      throw std::bad_alloc();
-    }
-  }
-
-  ~ProducerConsumerQueue() {
-    // We need to destruct anything that may still exist in our queue.
-    // (No real synchronization needed at destructor time: only one
-    // thread can be doing this.)
-    if (!std::is_trivially_destructible<T>::value) {
-      size_t readIndex = readIndex_;
-      size_t endIndex = writeIndex_;
-      while (readIndex != endIndex) {
-        records_[readIndex].~T();
-        if (++readIndex == size_) {
-          readIndex = 0;
+template<typename T>
+class SPSC1
+{
+public:
+    explicit SPSC1(size_t minCapacity)
+        : m_capacity(minCapacity)
+        , m_buffer(static_cast<T*>(std::malloc(m_capacity * sizeof(T))))
+    {
+        if (!m_buffer) {
+            throw std::bad_alloc();
         }
-      }
     }
 
-    std::free(records_);
-  }
+    ~SPSC1()
+    {
+        // We need to destruct anything that may still exist in our queue.
+        // (No real synchronization needed at destructor time: only one
+        // thread can be doing this.)
+        if (!std::is_trivially_destructible<T>::value) {
+            size_t readIndex = m_consumerData.readIndex;
+            size_t endIndex = m_producerData.writeIndex;
+            while (readIndex != endIndex) {
+                m_buffer[readIndex].~T();
+                readIndex++;
+                if (readIndex >= m_capacity) {
+                    readIndex = 0;
+                }
+            }
+        }
 
-  template <class... Args>
-  bool write(Args&&... recordArgs) {
-    auto const currentWrite = writeIndex_.load(std::memory_order_relaxed);
-    auto nextRecord = currentWrite + 1;
-    if (nextRecord == size_) {
-      nextRecord = 0;
-    }
-    if (nextRecord != readIndex_.load(std::memory_order_acquire)) {
-      new (&records_[currentWrite]) T(std::forward<Args>(recordArgs)...);
-      writeIndex_.store(nextRecord, std::memory_order_release);
-      return true;
-    }
-
-    // queue is full
-    return false;
-  }
-
-  // move (or copy) the value at the front of the queue to given variable
-  bool read(T& record) {
-    auto const currentRead = readIndex_.load(std::memory_order_relaxed);
-    if (currentRead == writeIndex_.load(std::memory_order_acquire)) {
-      // queue is empty
-      return false;
+        std::free(m_buffer);
     }
 
-    auto nextRecord = currentRead + 1;
-    if (nextRecord == size_) {
-      nextRecord = 0;
+    SPSC1(const SPSC1&) = delete;
+    SPSC1& operator=(const SPSC1&) = delete;
+    SPSC1(SPSC1&&) = delete;
+    SPSC1& operator=(SPSC1&&) = delete;
+
+    template<class... Args>
+    bool push(Args&&... args)
+    {
+        size_t currentWriteIndex = m_producerData.writeIndex.load(std::memory_order_relaxed);
+        size_t currentReadIndex = m_consumerData.readIndex.load(std::memory_order_acquire);
+        size_t availableSpace = getAvailableSpace(currentWriteIndex, currentReadIndex);
+
+        if (availableSpace < 1) {
+            return false;
+        }
+
+        new (&m_buffer[currentWriteIndex]) T(std::forward<Args>(args)...);
+
+        size_t nextWriteIndex = currentWriteIndex + 1;
+        if (nextWriteIndex >= m_capacity) {
+            nextWriteIndex = 0;
+        }
+        m_producerData.writeIndex.store(nextWriteIndex, std::memory_order_release);
+        return true;
     }
-    record = std::move(records_[currentRead]);
-    records_[currentRead].~T();
-    readIndex_.store(nextRecord, std::memory_order_release);
-    return true;
-  }
 
-  // pointer to the value at the front of the queue (for use in-place) or
-  // nullptr if empty.
-  T* frontPtr() {
-    auto const currentRead = readIndex_.load(std::memory_order_relaxed);
-    if (currentRead == writeIndex_.load(std::memory_order_acquire)) {
-      // queue is empty
-      return nullptr;
+    bool pop(T& output)
+    {
+        size_t currentReadIndex = m_consumerData.readIndex.load(std::memory_order_relaxed);
+        size_t currentWriteIndex = m_producerData.writeIndex.load(std::memory_order_acquire);
+        size_t availableSamples = calculateSize(currentWriteIndex, currentReadIndex);
+
+        if (availableSamples < 1) {
+            return false;
+        }
+
+        output = std::move(m_buffer[currentReadIndex]);
+        m_buffer[currentReadIndex].~T();
+
+        size_t nextReadIndex = currentReadIndex + 1;
+        if (nextReadIndex >= m_capacity) {
+            nextReadIndex = 0;
+        }
+        m_consumerData.readIndex.store(nextReadIndex, std::memory_order_release);
+        return true;
     }
-    return &records_[currentRead];
-  }
 
-  // queue must not be empty
-  void popFront() {
-    auto const currentRead = readIndex_.load(std::memory_order_relaxed);
-    assert(currentRead != writeIndex_.load(std::memory_order_acquire));
+    size_t capacity() const { return m_capacity - 1; }
 
-    auto nextRecord = currentRead + 1;
-    if (nextRecord == size_) {
-      nextRecord = 0;
+    bool isEmpty() const
+    {
+        return m_producerData.writeIndex.load(std::memory_order_acquire) ==
+               m_consumerData.readIndex.load(std::memory_order_acquire);
     }
-    records_[currentRead].~T();
-    readIndex_.store(nextRecord, std::memory_order_release);
-  }
-
-  bool isEmpty() const {
-    return readIndex_.load(std::memory_order_acquire) ==
-        writeIndex_.load(std::memory_order_acquire);
-  }
-
-  bool isFull() const {
-    auto nextRecord = writeIndex_.load(std::memory_order_acquire) + 1;
-    if (nextRecord == size_) {
-      nextRecord = 0;
+    bool isFull() const
+    {
+        auto nextWriteIndex = m_producerData.writeIndex.load(std::memory_order_acquire) + 1;
+        if (nextWriteIndex >= m_capacity) {
+            nextWriteIndex = 0;
+        }
+        return m_consumerData.readIndex.load(std::memory_order_acquire) == nextWriteIndex;
     }
-    if (nextRecord != readIndex_.load(std::memory_order_acquire)) {
-      return false;
+
+private:
+    size_t calculateSize(size_t writeIndex, size_t readIndex) const
+    {
+        if (writeIndex >= readIndex) return writeIndex - readIndex;
+        return m_capacity - readIndex + writeIndex;
     }
-    // queue is full
-    return true;
-  }
-
-  // * If called by consumer, then true size may be more (because producer may
-  //   be adding items concurrently).
-  // * If called by producer, then true size may be less (because consumer may
-  //   be removing items concurrently).
-  // * It is undefined to call this from any other thread.
-  size_t sizeGuess() const {
-    int ret = writeIndex_.load(std::memory_order_acquire) -
-        readIndex_.load(std::memory_order_acquire);
-    if (ret < 0) {
-      ret += size_;
+    size_t getAvailableSpace(size_t writeIndex, size_t readIndex) const
+    {
+        return m_capacity - 1 - calculateSize(writeIndex, readIndex);
     }
-    return ret;
-  }
 
-  // maximum number of items in the queue.
-  size_t capacity() const { return size_ - 1; }
+    using AtomicIndex = std::atomic<size_t>;
 
- private:
-  using AtomicIndex = std::atomic<unsigned int>;
+    const size_t m_capacity;
+    T* const m_buffer;
 
-  char pad0_[hardware_destructive_interference_size];
-  const uint32_t size_;
-  T* const records_;
+    struct
+    {
+        AtomicIndex readIndex = {0};
+    } m_consumerData;
 
-  alignas(hardware_destructive_interference_size) AtomicIndex readIndex_;
-  alignas(hardware_destructive_interference_size) AtomicIndex writeIndex_;
-
-  char pad1_[hardware_destructive_interference_size - sizeof(AtomicIndex)];
+    struct
+    {
+        AtomicIndex writeIndex = {0};
+    } m_producerData;
 };
-
-} // namespace folly
 ```
 
 ## 优化点2: 对齐cacheline防止false sharing
 [wiki:False_sharing](https://en.wikipedia.org/wiki/False_sharing)
 
-在上方贴出的ProducerConsumerQueue的实现中，你可能已经注意到了hardware_destructive_interference_size，它在folly里的定义如下：
+如果你看了[ProducerConsumerQueue](https://github.com/facebook/folly/blob/main/folly/ProducerConsumerQueue.h#L176)的实现，你可能已经注意到了hardware_destructive_interference_size，它在folly里的定义如下：
 ```c++
 #if defined(__cpp_lib_hardware_interference_size)
 
@@ -357,12 +297,149 @@ gcc/clang的情况则各式各样：https://github.com/llvm/llvm-project/pull/89
 
 最终基于cacheline的优化代码，只需要设置读写索引的对齐大小为cacheline大小：
 ```c++
-// 其他代码...
+#pragma once
+
+#include <new>
+
+// This block handles a GCC-specific warning about ABI stability.
+#if defined(__GNUC__) && !defined(__clang__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Winterference-size"
+#endif
+#if defined(__cpp_lib_hardware_interference_size)
+inline constexpr size_t kCacheLineSize = std::hardware_destructive_interference_size;
+#else
+inline constexpr size_t kCacheLineSize = 64;
+#endif
+#if defined(__GNUC__) && !defined(__clang__)
+#    pragma GCC diagnostic pop
+#endif
+```
+以上为kCacheLineSize的定义，后面出现的所有`kCacheLineSize`都是指这个值。
+
+```c++
+template<typename T>
+class SPSC2
+{
+public:
+    explicit SPSC2(size_t minCapacity)
+        : m_capacity(minCapacity)
+        , m_buffer(static_cast<T*>(std::malloc(m_capacity * sizeof(T))))
+    {
+        if (!m_buffer) {
+            throw std::bad_alloc();
+        }
+    }
+
+    ~SPSC2()
+    {
+        // We need to destruct anything that may still exist in our queue.
+        // (No real synchronization needed at destructor time: only one
+        // thread can be doing this.)
+        if (!std::is_trivially_destructible<T>::value) {
+            size_t readIndex = m_consumerData.readIndex;
+            size_t endIndex = m_producerData.writeIndex;
+            while (readIndex != endIndex) {
+                m_buffer[readIndex].~T();
+                readIndex++;
+                if (readIndex >= m_capacity) {
+                    readIndex = 0;
+                }
+            }
+        }
+
+        std::free(m_buffer);
+    }
+
+    SPSC2(const SPSC2&) = delete;
+    SPSC2& operator=(const SPSC2&) = delete;
+    SPSC2(SPSC2&&) = delete;
+    SPSC2& operator=(SPSC2&&) = delete;
+
+    template<class... Args>
+    bool push(Args&&... args)
+    {
+        size_t currentWriteIndex = m_producerData.writeIndex.load(std::memory_order_relaxed);
+        size_t currentReadIndex = m_consumerData.readIndex.load(std::memory_order_acquire);
+        size_t availableSpace = getAvailableSpace(currentWriteIndex, currentReadIndex);
+
+        if (availableSpace < 1) {
+            return false;
+        }
+
+        new (&m_buffer[currentWriteIndex]) T(std::forward<Args>(args)...);
+
+        size_t nextWriteIndex = currentWriteIndex + 1;
+        if (nextWriteIndex >= m_capacity) {
+            nextWriteIndex = 0;
+        }
+        m_producerData.writeIndex.store(nextWriteIndex, std::memory_order_release);
+        return true;
+    }
+
+    bool pop(T& output)
+    {
+        size_t currentReadIndex = m_consumerData.readIndex.load(std::memory_order_relaxed);
+        size_t currentWriteIndex = m_producerData.writeIndex.load(std::memory_order_acquire);
+        size_t availableSamples = calculateSize(currentWriteIndex, currentReadIndex);
+
+        if (availableSamples < 1) {
+            return false;
+        }
+
+        output = std::move(m_buffer[currentReadIndex]);
+        m_buffer[currentReadIndex].~T();
+
+        size_t nextReadIndex = currentReadIndex + 1;
+        if (nextReadIndex >= m_capacity) {
+            nextReadIndex = 0;
+        }
+        m_consumerData.readIndex.store(nextReadIndex, std::memory_order_release);
+        return true;
+    }
+
+    size_t capacity() const { return m_capacity - 1; }
+
+    bool isEmpty() const
+    {
+        return m_producerData.writeIndex.load(std::memory_order_acquire) ==
+               m_consumerData.readIndex.load(std::memory_order_acquire);
+    }
+    bool isFull() const
+    {
+        auto nextWriteIndex = m_producerData.writeIndex.load(std::memory_order_acquire) + 1;
+        if (nextWriteIndex >= m_capacity) {
+            nextWriteIndex = 0;
+        }
+        return m_consumerData.readIndex.load(std::memory_order_acquire) == nextWriteIndex;
+    }
+
 private:
-  // ...
-  alignas(kCacheLineSize) AtomicIndex readIndex_;
-  alignas(kCacheLineSize) AtomicIndex writeIndex_;
-}
+    size_t calculateSize(size_t writeIndex, size_t readIndex) const
+    {
+        if (writeIndex >= readIndex) return writeIndex - readIndex;
+        return m_capacity - readIndex + writeIndex;
+    }
+    size_t getAvailableSpace(size_t writeIndex, size_t readIndex) const
+    {
+        return m_capacity - 1 - calculateSize(writeIndex, readIndex);
+    }
+
+    using AtomicIndex = std::atomic<size_t>;
+
+    const size_t m_capacity;
+    T* const m_buffer;
+
+    struct alignas(kCacheLineSize)
+    {
+        AtomicIndex readIndex = {0};
+    } m_consumerData;
+
+    struct alignas(kCacheLineSize)
+    {
+        AtomicIndex writeIndex = {0};
+    } m_producerData;
+};
 ```
 
 ## 优化点3: 缓存读写位置
@@ -374,8 +451,125 @@ private:
 
 最终的基于索引缓存的成员变量
 ```c++
+template<typename T>
+class SPSC3
+{
+public:
+    explicit SPSC3(size_t minCapacity)
+        : m_capacity(minCapacity)
+        , m_buffer(static_cast<T*>(std::malloc(m_capacity * sizeof(T))))
+    {
+        if (!m_buffer) {
+            throw std::bad_alloc();
+        }
+    }
+
+    ~SPSC3()
+    {
+        // We need to destruct anything that may still exist in our queue.
+        // (No real synchronization needed at destructor time: only one
+        // thread can be doing this.)
+        if (!std::is_trivially_destructible<T>::value) {
+            size_t readIndex = m_consumerData.readIndex;
+            size_t endIndex = m_producerData.writeIndex;
+            while (readIndex != endIndex) {
+                m_buffer[readIndex].~T();
+                readIndex++;
+                if (readIndex >= m_capacity) {
+                    readIndex = 0;
+                }
+            }
+        }
+
+        std::free(m_buffer);
+    }
+
+    SPSC3(const SPSC3&) = delete;
+    SPSC3& operator=(const SPSC3&) = delete;
+    SPSC3(SPSC3&&) = delete;
+    SPSC3& operator=(SPSC3&&) = delete;
+
+    template<class... Args>
+    bool push(Args&&... args)
+    {
+        size_t currentWriteIndex = m_producerData.writeIndex.load(std::memory_order_relaxed);
+        size_t availableSpace = getAvailableSpace(currentWriteIndex, m_producerData.readIndexCache);
+
+        if (availableSpace < 1) {
+            // if not enough space, refresh the cached read index and check again
+            m_producerData.readIndexCache = m_consumerData.readIndex.load(std::memory_order_acquire);
+            availableSpace = getAvailableSpace(currentWriteIndex, m_producerData.readIndexCache);
+            if (availableSpace < 1) {
+                return false; // not enough space
+            }
+        }
+
+        new (&m_buffer[currentWriteIndex]) T(std::forward<Args>(args)...);
+
+        size_t nextWriteIndex = currentWriteIndex + 1;
+        if (nextWriteIndex >= m_capacity) {
+            nextWriteIndex = 0;
+        }
+        m_producerData.writeIndex.store(nextWriteIndex, std::memory_order_release);
+        return true;
+    }
+
+    bool pop(T& output)
+    {
+        size_t currentReadIndex = m_consumerData.readIndex.load(std::memory_order_relaxed);
+        size_t availableSamples = calculateSize(m_consumerData.writeIndexCache, currentReadIndex);
+
+        if (availableSamples < 1) {
+            m_consumerData.writeIndexCache = m_producerData.writeIndex.load(std::memory_order_acquire);
+            availableSamples = calculateSize(m_consumerData.writeIndexCache, currentReadIndex);
+            if (availableSamples < 1) {
+                return false;  // not enough samples
+            }
+        }
+
+        output = std::move(m_buffer[currentReadIndex]);
+        m_buffer[currentReadIndex].~T();
+
+        size_t nextReadIndex = currentReadIndex + 1;
+        if (nextReadIndex >= m_capacity) {
+            nextReadIndex = 0;
+        }
+        m_consumerData.readIndex.store(nextReadIndex, std::memory_order_release);
+        return true;
+    }
+
+    size_t capacity() const { return m_capacity - 1; }
+
+    bool isEmpty() const
+    {
+        return m_producerData.writeIndex.load(std::memory_order_acquire) ==
+               m_consumerData.readIndex.load(std::memory_order_acquire);
+    }
+    bool isFull() const
+    {
+        auto nextWriteIndex = m_producerData.writeIndex.load(std::memory_order_acquire) + 1;
+        if (nextWriteIndex >= m_capacity) {
+            nextWriteIndex = 0;
+        }
+        return m_consumerData.readIndex.load(std::memory_order_acquire) == nextWriteIndex;
+    }
+
 private:
-    // ...
+    size_t calculateSize(size_t writeIndex, size_t readIndex) const
+    {
+        if (writeIndex >= readIndex) return writeIndex - readIndex;
+        return m_capacity - readIndex + writeIndex;
+    }
+    size_t getAvailableSpace(size_t writeIndex, size_t readIndex) const
+    {
+        return m_capacity - 1 - calculateSize(writeIndex, readIndex);
+    }
+
+    using AtomicIndex = std::atomic<size_t>;
+
+    const size_t m_capacity;
+    T* const m_buffer;
+
     struct alignas(kCacheLineSize)
     {
         AtomicIndex readIndex = {0};
@@ -545,3 +739,9 @@ private:
 * Claim: 生产者问队列：“给我预留 N 个位置，把指针给我”。
 * Write: 生产者直接往这些指针里写数据（Zero-Copy，直接构造）。
 * Commit: 生产者告诉队列：“这 N 个写完了，更新索引”。
+
+## 更新
+发现[cppcon2023 spsc](https://www.youtube.com/watch?v=K3P_Lmq6pw0)的视频已经讲过了，对应的[github代码](https://github.com/CharlesFrasch/cppcon2023)。  
+而且总结的条款顺序和我一样，不过作者最后放的测试结果，我的机器上没发现他写的Fifi4a比其他的开源库有明显的性能提升，毕竟这些spsc的代码都大差不差的。
+
+我的测试代码见[miyanyan/spsc](https://github.com/miyanyan/spsc)
