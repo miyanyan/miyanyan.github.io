@@ -264,3 +264,8 @@ highfive[opencv]:arm64-windows = cascade
 我最开始更新[boost 1.87.0](https://github.com/microsoft/vcpkg/pull/42678) 时是傻乎乎的一个个的更新的，后来才发现官方有脚本的......
 
 脚本路径为`vcpkg/scripts/boost/generate-ports.ps1`, 注意要使用PowerShell 6 或更高版本，否则会报错。
+
+### 有的库在build过程中会执行一些自己编译出的可执行文件，此时可能会报错无法找到dll等报错
+
+给`vcpkg_cmake_install`添加参数[ADD_BIN_TO_PATH](https://learn.microsoft.com/en-us/vcpkg/maintainers/functions/vcpkg_cmake_install#add_bin_to_path)
+
