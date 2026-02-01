@@ -269,3 +269,7 @@ highfive[opencv]:arm64-windows = cascade
 
 给`vcpkg_cmake_install`添加参数[ADD_BIN_TO_PATH](https://learn.microsoft.com/en-us/vcpkg/maintainers/functions/vcpkg_cmake_install#add_bin_to_path)
 
+### 针对交叉编译的条件判断
+
+使用[VCPKG_CROSSCOMPILING](https://learn.microsoft.com/zh-cn/vcpkg/users/host-dependencies)
+
