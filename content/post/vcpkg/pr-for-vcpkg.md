@@ -273,3 +273,12 @@ highfive[opencv]:arm64-windows = cascade
 
 使用[VCPKG_CROSSCOMPILING](https://learn.microsoft.com/zh-cn/vcpkg/users/host-dependencies)
 
+但是但是但是！！！！！！！！
+`VCPKG_CROSSCOMPILING`并不是`CMAKE_CROSSCOMPILING`，
+定义如下：
+```cmake
+string(COMPARE NOTEQUAL "${TARGET_TRIPLET}" "${HOST_TRIPLET}" VCPKG_CROSSCOMPILING)
+```
+可见`x64-windows`和`x64-windows-static`不一样就会导致`VCPKG_CROSSCOMPILING`为true...
+
+在[ecal](https://github.com/microsoft/vcpkg/pull/49552)更新时遇到了这个问题
