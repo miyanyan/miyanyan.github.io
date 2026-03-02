@@ -18,6 +18,22 @@
 
 <script defer src="https://cn.vercount.one/js"></script>
 
+{{ if and .IsPage .Site.Params.mathjax.enabled }}
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{{ end }}
+
 <style>
   @font-face {
     font-family: 'MapleMono2';
