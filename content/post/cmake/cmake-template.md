@@ -47,7 +47,7 @@ tags:
 
     ```cmake
     set(CMAKE_SKIP_BUILD_RPATH  FALSE) # 加入rpath
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) # 表示编译的时候是否使用CMAKE_INSTALL_RPATH作为rpath路径
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) # 表示编译的时候是否使用CMAKE_INSTALL_RPATH作为rpath路径
     set(CMAKE_INSTALL_RPATH "\${ORIGIN}") # 设置rpath安装时的路径，${ORIGIN}代表运行时当前目录
     ```
 
@@ -211,4 +211,90 @@ tags:
         set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
         set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
     endif()
+    ```
+
+14. 如果是一个OBJECT的target，不要用`target_link_libraries`, 而是用`target_source`, 否则cmake install 有问题
+    ```cmake
+    target_sources(xxx PRIVATE
+        $<TARGET_OBJECTS:yyy>
+    )
+    ```
+
+15. cmake install 一般流程
+    ```cmake
+    # --- install
+    include(GNUInstallDirs)
+    install(TARGETS xxx
+        EXPORT xxxTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+    install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    install(EXPORT xxxTargets
+        FILE xxxTargets.cmake
+        NAMESPACE xxx::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/xxx
+        # 添加依赖传递配置
+        EXPORT_LINK_INTERFACE_LIBRARIES
+    )
+    include(CMakePackageConfigHelpers)
+
+    # 生成 xxx-config.cmake 和版本文件
+    configure_package_config_file(
+    ${CMAKE_HOME_DIRECTORY}/cmake/xxxConfig.cmake.in  # 模板路径
+    ${CMAKE_CURRENT_BINARY_DIR}/xxxConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/xxx
+    )
+
+    write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/xxxVersion.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+    install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/xxxConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/xxxVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/xxx
+    )
+
+    ```
+
+16. 动态库的一般定义和导出宏配置   
+    `export.h`:
+    ```c++
+    #pragma once
+
+    #if defined(_WIN32)
+    #    define XXX_EXPORT __declspec(dllexport)
+    #    define XXX_IMPORT __declspec(dllimport)
+    #else
+    #    define XXX_EXPORT __attribute__((visibility("default")))
+    #    define XXX_IMPORT __attribute__((visibility("default")))
+    #endif
+
+    ```
+    `api.h`:
+    ```c++
+    #pragma once
+
+    #include "export.h"
+
+    #if defined(XXX_CORE_EXPORTS)
+    #    define XXX_CORE_API XXX_EXPORT
+    #elif defined(XXX_CORE_IMPORTS)
+    #    define XXX_CORE_API XXX_IMPORT
+    #else
+    #    define XXX_CORE_API
+    #endif
+
+    ```
+    `CMakeLists.txt`
+    ```cmake
+    target_compile_definitions(xxx
+        INTERFACE
+            $<$<BOOL:${BUILD_SHARED_LIBS}>:XXX_CORE_IMPORTS>
+        PRIVATE
+            $<$<BOOL:${BUILD_SHARED_LIBS}>:XXX_CORE_EXPORTS>
+    )
     ```
