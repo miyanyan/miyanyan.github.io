@@ -246,7 +246,7 @@ template<typename _RandomAccessIterator, typename _Compare>
     }
 ```
 
-采用的是`first + 1` `mid` `last - 1`, 注意last-1是因为last是左闭右开的**开**, first+1则是因为想把first空出来放pivot?
+采用的是`first + 1` `mid` `last - 1`, 注意last-1是因为last是左闭右开的**开**, first+1则是因为想把first空出来放pivot
 
 ## 递归深度判断
 
@@ -304,4 +304,51 @@ template<typename _RandomAccessIterator, typename _Compare>
 	  std::__final_insertion_sort(__first, __last, __comp);
 	}
     }
+```
+
+## 快排的简单实现
+
+```cpp
+void quickSort(vector<int>& nums)
+{
+    quickSort(nums, 0, nums.size());
+}
+
+void quickSort(vector<int>& nums, int first, int last)
+{
+    if (last - first <= 1) return;
+    int pivot = partition(nums, first, last);
+    quickSort(nums, first, pivot);
+    quickSort(nums, pivot + 1, last);
+}
+
+// nums must not be empty
+int partition(vector<int>& nums, int first, int last) 
+{
+    // 简单取mid作为pivot
+    int pivot = first + (last - first) / 2;
+    int pivotValue = nums[pivot];
+    swap(nums[first], nums[pivot]);
+    int left = first + 1;
+    int right = last - 1;
+    while (true) {
+        while (left <= right && nums[left] < pivotValue) {
+            left++;
+        }
+        // now [first + 1, left) < pivot
+        while (left <= right && nums[right] > pivotValue) {
+            right--;
+        }
+        // now (right, last) > pivot
+        if (left >= right) {
+            break;
+        }
+        swap(nums[left], nums[right]);
+        left++;
+        right--;
+    }
+    swap(nums[first], nums[right]);
+    return right;
+}
+
 ```
