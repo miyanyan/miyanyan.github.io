@@ -23,7 +23,7 @@ tag: [c++, std]
     * gcc: `constexpr std::string_view get_raw_name() [with T = int; std::string_view = std::basic_string_view<char>]`
     * clang: `std::string_view get_raw_name() [T = int]`
 
-**【缺陷】并不能保证各个编译器下的字符串完全一致，包括但不限于多或少一个空格，逗号的位置等等（msvc还会加上class struct union关键字！）**
+**【缺陷】并不能保证各个编译器下的字符串完全一致，包括但不限于多或少一个空格，逗号的位置, const volatile同时出现时的顺序等等（msvc还会加上class struct union enum关键字！而且(enum class/enum struct/enum)这三个的输出都是enum!）**
 
 ## 代码
 
@@ -53,4 +53,4 @@ inline constexpr std::string_view type_string() {
 ```
 
 代码确实很简洁！但是输出不能保证各个编译器的一致性，具体输出见：
-[compiler explorer 在线运行链接](https://www.godbolt.org/z/dncsebqKv)
+[compiler explorer 在线运行链接](https://www.godbolt.org/z/eq376ehjG)
