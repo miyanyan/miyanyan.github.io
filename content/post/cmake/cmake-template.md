@@ -298,3 +298,11 @@ tags:
             $<$<BOOL:${BUILD_SHARED_LIBS}>:XXX_CORE_EXPORTS>
     )
     ```
+
+17. CMake/Ninja 中文版 MSVC 倾泻海量“注意: 包含文件”的问题
+    
+    Ninja 和 CMake 的流解析器在编写时，默认仅匹配英文前缀 Note: including file:   
+    这里强制将 MSVC 编译器的日志输出语言切换为英文（区域 ID: 1033）
+    ```cmd
+    setx VSLANG 1033
+    ```
