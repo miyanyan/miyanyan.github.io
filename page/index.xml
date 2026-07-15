@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on miyan的博客</title><link>https://miyan.site/page/</link><description>Recent content in Pages on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 16 Dec 2025 18:00:42 +0800</lastBuildDate><atom:link href="https://miyan.site/page/index.xml" rel="self" type="application/rss+xml"/><item><title>归档</title><link>https://miyan.site/archives/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://miyan.site/archives/</guid><description/></item><item><title>链接</title><link>https://miyan.site/%E9%93%BE%E6%8E%A5/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://miyan.site/%E9%93%BE%E6%8E%A5/</guid><description>&lt;p&gt;记录有用的网站链接&lt;/p&gt;
+&lt;h2 id="vcpkg"&gt;vcpkg
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://devblogs.microsoft.com/cppblog/using-system-package-manager-dependencies-with-vcpkg/#using-curl-and-openssl-from-the-system-package-manager" target="_blank" rel="noopener"
+&gt;https://devblogs.microsoft.com/cppblog/using-system-package-manager-dependencies-with-vcpkg/#using-curl-and-openssl-from-the-system-package-manager&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://learn.microsoft.com/en-us/vcpkg/users/triplets#vcpkg_env_passthrough" target="_blank" rel="noopener"
+&gt;https://learn.microsoft.com/en-us/vcpkg/users/triplets#vcpkg_env_passthrough&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- To use this feature, add `links` section to frontmatter.
+This page's frontmatter:
+```yaml
+links:
+- title: GitHub
+description: GitHub is the world's largest software development platform.
+website: https://github.com
+image: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+- title: TypeScript
+description: TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.
+website: https://www.typescriptlang.org
+image: ts-logo-128.jpg
+```
+`image` field accepts both local and external images. --&gt;</description></item><item><title>搜索</title><link>https://miyan.site/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://miyan.site/search/</guid><description/></item></channel></rss>
