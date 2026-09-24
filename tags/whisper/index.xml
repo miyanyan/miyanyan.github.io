@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Whisper on miyan的博客</title><link>https://miyan.site/tags/whisper/</link><description>Recent content in Whisper on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 14 Oct 2025 22:00:06 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/whisper/index.xml" rel="self" type="application/rss+xml"/><item><title>【程序员的工具】怎么提取mp3文件中的音频为文字</title><link>https://miyan.site/p/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%B7%A5%E5%85%B7%E6%80%8E%E4%B9%88%E6%8F%90%E5%8F%96mp3%E6%96%87%E4%BB%B6%E4%B8%AD%E7%9A%84%E9%9F%B3%E9%A2%91%E4%B8%BA%E6%96%87%E5%AD%97/</link><pubDate>Tue, 14 Oct 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%B7%A5%E5%85%B7%E6%80%8E%E4%B9%88%E6%8F%90%E5%8F%96mp3%E6%96%87%E4%BB%B6%E4%B8%AD%E7%9A%84%E9%9F%B3%E9%A2%91%E4%B8%BA%E6%96%87%E5%AD%97/</guid><description>&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;最近手头有几个音频文件，想要提取出来，但是网上一搜信息过于繁杂，这时我突然想起来github上我star了whisper这个项目，当时只是看了一下介绍，觉得很有意思，再加上是openai出品，就star了，同时还发现一个whisper.cpp的项目，当然都没有怎么仔细看，只是知道这个项目可以提取mp3文件中的音频为文字。欸！今天就用上了~&lt;/p&gt;
+&lt;h2 id="安装whisper"&gt;安装whisper
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;首先安装ffmpeg，并配置好环境变量&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;这里我们使用uv来安装whisper，假设你已经熟悉uv的用法了&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-gdscript3" data-lang="gdscript3"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;uv&lt;/span&gt; &lt;span class="k"&gt;tool&lt;/span&gt; &lt;span class="n"&gt;install&lt;/span&gt; &lt;span class="n"&gt;openai&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;whisper&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="使用whisper"&gt;使用whisper
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;打开命令行，直接输入&lt;code&gt;whisper xxx.mp3&lt;/code&gt;即可，xxx.mp3是你要提取音频的mp3文件名，程序会自动提取出音频中的文字并打印出来。&lt;/li&gt;
+&lt;li&gt;这里我们什么都不管，直接就敲这两个字符，直接出结果（第一次会先下载模型文件），除了控制台的输出，还会生成一个xxx.txt文件，里面就是提取出的文字。&lt;/li&gt;
+&lt;li&gt;详细用法可以看&lt;a class="link" href="https://github.com/openai/whisper" target="_blank" rel="noopener"
+&gt;官方文档&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;不得不感叹程序员就是好呀，有这么多的开源工具可以使用，敲一点点命令就能出结果，&lt;code&gt;simple is better than complex!&lt;/code&gt;。&lt;/p&gt;</description></item></channel></rss>
