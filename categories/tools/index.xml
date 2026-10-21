@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tools on miyan的博客</title><link>https://miyan.site/categories/tools/</link><description>Recent content in Tools on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 05 Nov 2025 20:29:25 +0800</lastBuildDate><atom:link href="https://miyan.site/categories/tools/index.xml" rel="self" type="application/rss+xml"/><item><title>【程序员的工具】在手机上使用Termux和Claude Code</title><link>https://miyan.site/p/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%B7%A5%E5%85%B7%E5%9C%A8%E6%89%8B%E6%9C%BA%E4%B8%8A%E4%BD%BF%E7%94%A8termux%E5%92%8Cclaude-code/</link><pubDate>Wed, 05 Nov 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%B7%A5%E5%85%B7%E5%9C%A8%E6%89%8B%E6%9C%BA%E4%B8%8A%E4%BD%BF%E7%94%A8termux%E5%92%8Cclaude-code/</guid><description>&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;作为一名程序员，我们经常需要随时随地处理代码或者进行开发工作。虽然笔记本电脑便携性不错，但有时候我们可能只想用手机来处理一些简单的编程任务。今天我要介绍如何在Android手机上通过Termux配置一个完整的Claude Code开发环境，让你真正做到&amp;quot;手机就是开发机&amp;quot;！&lt;/p&gt;
+&lt;h2 id="什么是termux"&gt;什么是Termux
+&lt;/h2&gt;&lt;p&gt;Termux是一个Android终端模拟器和Linux环境应用程序，它可以直接在手机上运行许多Linux命令行工具，无需root权限。通过Termux，我们可以在手机上拥有一个功能强大的命令行环境。&lt;/p&gt;
+&lt;h2 id="安装termux"&gt;安装Termux
+&lt;/h2&gt;&lt;p&gt;首先需要安装Termux应用。由于Google Play上的Termux版本比较老旧，推荐从GitHub下载最新版本：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;访问 &lt;a class="link" href="https://github.com/termux/termux-app/releases" target="_blank" rel="noopener"
+&gt;Termux GitHub Releases&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;下载适合你手机架构的APK文件，通常选择 &lt;code&gt;termux-app_v0.118.3+github-debug_arm64-v8a.apk&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;在手机上安装该APK文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="配置termux环境"&gt;配置Termux环境
+&lt;/h2&gt;&lt;p&gt;安装完成后，打开Termux应用，首先更新软件包列表和已安装的软件包：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pkg update &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; pkg upgrade
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后安装必要的开发工具：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pkg install nodejs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pkg install git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="安装claude-code"&gt;安装Claude Code
+&lt;/h2&gt;&lt;p&gt;Claude Code是Anthropic官方提供的命令行工具，可以让我们直接在终端中与Claude进行交互。通过npm安装：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;npm install -g @anthropic-ai/claude-code
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="配置api密钥"&gt;配置API密钥
+&lt;/h2&gt;&lt;p&gt;要使用Claude Code，需要配置API密钥。如果你有Anthropic的API密钥，可以直接使用。如果没有，可以使用第三方API服务, 这里以glm为例：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;ANTHROPIC_BASE_URL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;https://open.bigmodel.cn/api/anthropic
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;ANTHROPIC_AUTH_TOKEN&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;YOUR_API_KEY
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;将 &lt;code&gt;YOUR_API_KEY&lt;/code&gt; 替换为你的实际API密钥。&lt;/p&gt;
+&lt;p&gt;为了方便使用，可以将这些环境变量添加到shell配置文件中：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;export ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; ~/.bashrc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;export ANTHROPIC_AUTH_TOKEN=YOUR_API_KEY&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; ~/.bashrc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;source&lt;/span&gt; ~/.bashrc
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="使用claude-code"&gt;使用Claude Code
+&lt;/h2&gt;&lt;p&gt;配置完成后，就可以直接使用Claude Code了：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;claude
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果配置正确，你应该能看到Claude Code的启动界面。&lt;/p&gt;</description></item><item><title>【程序员的工具】怎么提取mp3文件中的音频为文字</title><link>https://miyan.site/p/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%B7%A5%E5%85%B7%E6%80%8E%E4%B9%88%E6%8F%90%E5%8F%96mp3%E6%96%87%E4%BB%B6%E4%B8%AD%E7%9A%84%E9%9F%B3%E9%A2%91%E4%B8%BA%E6%96%87%E5%AD%97/</link><pubDate>Tue, 14 Oct 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%B7%A5%E5%85%B7%E6%80%8E%E4%B9%88%E6%8F%90%E5%8F%96mp3%E6%96%87%E4%BB%B6%E4%B8%AD%E7%9A%84%E9%9F%B3%E9%A2%91%E4%B8%BA%E6%96%87%E5%AD%97/</guid><description>&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;最近手头有几个音频文件，想要提取出来，但是网上一搜信息过于繁杂，这时我突然想起来github上我star了whisper这个项目，当时只是看了一下介绍，觉得很有意思，再加上是openai出品，就star了，同时还发现一个whisper.cpp的项目，当然都没有怎么仔细看，只是知道这个项目可以提取mp3文件中的音频为文字。欸！今天就用上了~&lt;/p&gt;
+&lt;h2 id="安装whisper"&gt;安装whisper
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;首先安装ffmpeg，并配置好环境变量&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;这里我们使用uv来安装whisper，假设你已经熟悉uv的用法了&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-gdscript3" data-lang="gdscript3"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;uv&lt;/span&gt; &lt;span class="k"&gt;tool&lt;/span&gt; &lt;span class="n"&gt;install&lt;/span&gt; &lt;span class="n"&gt;openai&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;whisper&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="使用whisper"&gt;使用whisper
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;打开命令行，直接输入&lt;code&gt;whisper xxx.mp3&lt;/code&gt;即可，xxx.mp3是你要提取音频的mp3文件名，程序会自动提取出音频中的文字并打印出来。&lt;/li&gt;
+&lt;li&gt;这里我们什么都不管，直接就敲这两个字符，直接出结果（第一次会先下载模型文件），除了控制台的输出，还会生成一个xxx.txt文件，里面就是提取出的文字。&lt;/li&gt;
+&lt;li&gt;详细用法可以看&lt;a class="link" href="https://github.com/openai/whisper" target="_blank" rel="noopener"
+&gt;官方文档&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;不得不感叹程序员就是好呀，有这么多的开源工具可以使用，敲一点点命令就能出结果，&lt;code&gt;simple is better than complex!&lt;/code&gt;。&lt;/p&gt;</description></item></channel></rss>

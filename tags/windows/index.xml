@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Windows on miyan的博客</title><link>https://miyan.site/tags/windows/</link><description>Recent content in Windows on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sun, 11 May 2025 12:43:17 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/windows/index.xml" rel="self" type="application/rss+xml"/><item><title>windows添加防火墙规则</title><link>https://miyan.site/p/windows%E6%B7%BB%E5%8A%A0%E9%98%B2%E7%81%AB%E5%A2%99%E8%A7%84%E5%88%99/</link><pubDate>Wed, 06 Mar 2024 00:00:00 +0000</pubDate><guid>https://miyan.site/p/windows%E6%B7%BB%E5%8A%A0%E9%98%B2%E7%81%AB%E5%A2%99%E8%A7%84%E5%88%99/</guid><description>&lt;p&gt;bat脚本如下，涉及到的函数主要是 netsh advfirewall firewall add rule 和 netsh advfirewall firewall delete rule&lt;/p&gt;
+&lt;p&gt;需要注意的一个坑是program的路径不能存在斜杠&lt;code&gt;/&lt;/code&gt;，需要使用&lt;code&gt;\&lt;/code&gt;，然而很多软件都会自动把路径生成为类似于&lt;code&gt;C:/User/...&lt;/code&gt;这种形式，需要在脚本里转换一下&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bat" data-lang="bat"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;rem Check if both program path and program name are provided as arguments&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%~1&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;echo&lt;/span&gt; Usage: &lt;span class="nv"&gt;%0&lt;/span&gt; program_path program_name
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;echo&lt;/span&gt; Example: &lt;span class="nv"&gt;%0&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;C:\Path\to\your\program.exe&amp;#34;&lt;/span&gt; YourProgramName
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;exit&lt;/span&gt; /b 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%~2&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;echo&lt;/span&gt; Usage: &lt;span class="nv"&gt;%0&lt;/span&gt; program_path program_name
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;echo&lt;/span&gt; Example: &lt;span class="nv"&gt;%0&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;C:\Path\to\your\program.exe&amp;#34;&lt;/span&gt; YourProgramName
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;exit&lt;/span&gt; /b 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;set&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;programPath=&lt;/span&gt;&lt;span class="nv"&gt;%~1&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;set&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;programName=&lt;/span&gt;&lt;span class="nv"&gt;%~2&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;rem 替换斜杠为反斜杠&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;set&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;programPath=&lt;/span&gt;&lt;span class="nv"&gt;%programPath:/=\%&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;rem Delete firewall rule&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh advfirewall firewall delete rule name=&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%programName%&lt;/span&gt;&lt;span class="s2"&gt;(TCP)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh advfirewall firewall delete rule name=&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%programName%&lt;/span&gt;&lt;span class="s2"&gt;(UDP)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;rem Add firewall rule for TCP&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh advfirewall firewall add rule name=&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%programName%&lt;/span&gt;&lt;span class="s2"&gt;(TCP)&amp;#34;&lt;/span&gt; dir=in program=&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%programPath%&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt; action=allow protocol=TCP
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;rem Add firewall rule for UDP&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh advfirewall firewall add rule name=&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%programName%&lt;/span&gt;&lt;span class="s2"&gt;(UDP)&amp;#34;&lt;/span&gt; dir=in program=&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%programPath%&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt; action=allow protocol=UDP
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;echo&lt;/span&gt; Firewall rules for &lt;span class="nv"&gt;%programName%&lt;/span&gt; added successfully.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item><item><title>windows自动以管理员身份运行bat文件</title><link>https://miyan.site/p/windows%E8%87%AA%E5%8A%A8%E4%BB%A5%E7%AE%A1%E7%90%86%E5%91%98%E8%BA%AB%E4%BB%BD%E8%BF%90%E8%A1%8Cbat%E6%96%87%E4%BB%B6/</link><pubDate>Mon, 25 Dec 2023 00:00:00 +0000</pubDate><guid>https://miyan.site/p/windows%E8%87%AA%E5%8A%A8%E4%BB%A5%E7%AE%A1%E7%90%86%E5%91%98%E8%BA%AB%E4%BB%BD%E8%BF%90%E8%A1%8Cbat%E6%96%87%E4%BB%B6/</guid><description>&lt;p&gt;作者：Scruel
+链接：&lt;a class="link" href="https://www.zhihu.com/question/34541107/answer/243592603" target="_blank" rel="noopener"
+&gt;https://www.zhihu.com/question/34541107/answer/243592603&lt;/a&gt;
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。&lt;/p&gt;
+&lt;p&gt;正好看到, 那就一行代码解决问题吧&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bat" data-lang="bat"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;net file &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;NUL &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;NUL &lt;span class="p"&gt;||&lt;/span&gt; &lt;span class="k"&gt;start&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt; mshta vbscript:CreateObject(&lt;span class="s2"&gt;&amp;#34;Shell.Application&amp;#34;&lt;/span&gt;).ShellExecute(&lt;span class="s2"&gt;&amp;#34;cmd.exe&amp;#34;&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;/c pushd &amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%~dp0&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34; &amp;amp;&amp;amp; &amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%~s0&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34; &lt;/span&gt;&lt;span class="nv"&gt;%*&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;runas&amp;#34;&lt;/span&gt;,0)(window.close) &lt;span class="p"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="k"&gt;exit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果VBScript 被砍掉，则可用 powershell 来执行，原理是一样的：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bat" data-lang="bat"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;net file &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;NUL &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;NUL &lt;span class="p"&gt;||&lt;/span&gt; powershell Start-Process -FilePath cmd.exe -ArgumentList &lt;span class="s2"&gt;&amp;#34;&amp;#34;&amp;#34;/c pushd &lt;/span&gt;&lt;span class="nv"&gt;%~dp0&lt;/span&gt;&lt;span class="s2"&gt; &amp;amp;&amp;amp; &lt;/span&gt;&lt;span class="nv"&gt;%~s0&lt;/span&gt;&lt;span class="s2"&gt; &lt;/span&gt;&lt;span class="nv"&gt;%*&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt; -Verb RunAs &lt;span class="p"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="k"&gt;exit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可支持：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;带空格的脚本路径&lt;/li&gt;
+&lt;li&gt;自动切换至脚本所在的路径&lt;/li&gt;
+&lt;li&gt;脚本参数传递&lt;/li&gt;
+&lt;li&gt;可隐藏窗口执行脚本（下文）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;需要隐藏窗口执行的话，对于 mshta 版本，只需要改变 0 为 1 即可：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bat" data-lang="bat"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;net file &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;NUL &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;NUL &lt;span class="p"&gt;||&lt;/span&gt; &lt;span class="k"&gt;start&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt; mshta vbscript:CreateObject(&lt;span class="s2"&gt;&amp;#34;Shell.Application&amp;#34;&lt;/span&gt;).ShellExecute(&lt;span class="s2"&gt;&amp;#34;cmd.exe&amp;#34;&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;/c pushd &amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%~dp0&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34; &amp;amp;&amp;amp; &amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;%~s0&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34; &lt;/span&gt;&lt;span class="nv"&gt;%*&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;runas&amp;#34;&lt;/span&gt;,1)(window.close) &lt;span class="p"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="k"&gt;exit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;以及 powershell 版本，简单增加 -WindowStyle Hidden 即可：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bat" data-lang="bat"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;net file &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;NUL &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;NUL &lt;span class="p"&gt;||&lt;/span&gt; powershell Start-Process -FilePath cmd.exe -ArgumentList &lt;span class="s2"&gt;&amp;#34;&amp;#34;&amp;#34;/c pushd &lt;/span&gt;&lt;span class="nv"&gt;%~dp0&lt;/span&gt;&lt;span class="s2"&gt; &amp;amp;&amp;amp; &lt;/span&gt;&lt;span class="nv"&gt;%~s0&lt;/span&gt;&lt;span class="s2"&gt; &lt;/span&gt;&lt;span class="nv"&gt;%*&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt; -Verb RunAs -WindowStyle Hidden &lt;span class="p"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="k"&gt;exit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;解释一下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;当前值&lt;/th&gt;
+&lt;th&gt;当前值含义&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;%~s0&lt;/td&gt;
+&lt;td&gt;脚本的绝对路径&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;%~dp0&lt;/td&gt;
+&lt;td&gt;脚本所在目录的绝对路径&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;runas&lt;/td&gt;
+&lt;td&gt;以管理员权限执行&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;使用 cmd.exe 来执行，是为了能让脚本在执行时，自动切换到其所在的路径，因为直接通过 ShellExecute执行，并不能做到自动切换目录。&lt;/p&gt;</description></item></channel></rss>

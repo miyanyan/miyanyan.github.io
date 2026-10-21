@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Clangd on miyan的博客</title><link>https://miyan.site/tags/clangd/</link><description>Recent content in Clangd on miyan的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 10 May 2025 18:26:21 +0800</lastBuildDate><atom:link href="https://miyan.site/tags/clangd/index.xml" rel="self" type="application/rss+xml"/><item><title>vscode clangd 设置</title><link>https://miyan.site/p/vscode-clangd-%E8%AE%BE%E7%BD%AE/</link><pubDate>Fri, 14 Mar 2025 00:00:00 +0000</pubDate><guid>https://miyan.site/p/vscode-clangd-%E8%AE%BE%E7%BD%AE/</guid><description>&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;禁用microsoft c++插件的提示
+打开vscode的设置界面，搜索&lt;code&gt;c++ engine&lt;/code&gt;，选择&lt;code&gt;C_Cpp.intelliSenseEngine&lt;/code&gt;，设置为&lt;code&gt;disabled&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;对应的settings.json设置为&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;C_Cpp.intelliSenseEngine&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;disabled&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;添加clangd参数&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;不自动添加头文件&lt;/li&gt;
+&lt;li&gt;补全时不自动填写函数参数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;打开vscode的设置界面，搜索&lt;code&gt;clangd arguments&lt;/code&gt;，选择&lt;code&gt;clangd.arguments&lt;/code&gt;，点击&lt;code&gt;Add Item&lt;/code&gt;添加对应参数。&lt;/p&gt;
+&lt;p&gt;对应的settings.json设置为&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;clangd.arguments&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;--header-insertion=never&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;--function-arg-placeholders=0&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;</description></item></channel></rss>
